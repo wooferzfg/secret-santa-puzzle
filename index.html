@@ -8,5 +8,20 @@
         <script src="script.js"></script>
     </head>
     <body>
+        <div class="main-container">
+            <div class="main-container-inner">
+                <div id="response-text"></div>
+                <form onsubmit="sendCommand(event)">
+                    <div class="command-container">
+                        <div class="command-input-container">
+                            <input id="command-input" placeholder="Command"/>
+                        </div>
+                        <button type="submit" class="send-command-button">
+                            Send
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
     </body>
 </html>
