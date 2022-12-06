@@ -34,12 +34,16 @@ const BorderType = {
   VERTICAL: 'vertical',
 };
 
-const islands = [];
-const corners = [];
-const horizontalBorders = [];
-const verticalBorders = [];
-const playerPosition = { row: 2, column: 1 };
-const snakePosition = { row: 1, column: 2 };
+const INITIAL_PLAYER_POSITION = { row: 2, column: 1 };
+const INITIAL_SNAKE_POSITION = { row: 1, column: 2 };
+
+let islands;
+let corners;
+let horizontalBorders;
+let verticalBorders;
+let playerPosition;
+let snakePosition;
+let pathLength;
 
 const GRID_WIDTH = 5;
 const GRID_HEIGHT = 5;
@@ -80,6 +84,7 @@ class Corner {
   constructor(row, column) {
     this.row = row;
     this.column = column;
+    this.visitedBySnake = false;
   }
 
   getBorder(direction) {
@@ -98,6 +103,18 @@ class Corner {
     return corners[this.row + vector.row]?.[this.column + vector.column];
   }
 
+  getVisitedBySnake() {
+    return this.visitedBySnake;
+  }
+
+  setVisitedBySnake() {
+    this.visitedBySnake = true;
+  }
+
+  isInitialSnakePosition() {
+    return this.row === INITIAL_SNAKE_POSITION.row && this.column === INITIAL_SNAKE_POSITION.column;
+  }
+
   static getCornerForPosition(position) {
     return corners[position.row]?.[position.column];
   }
@@ -109,14 +126,41 @@ class Border {
     this.column = column;
     this.type = type;
     this.visitedBySnake = false;
+    this.noBridge = false;
+    this.isIronBridge = false;
+    this.isLava = false;
   }
 
   getVisitedBySnake() {
     return this.visitedBySnake;
   }
+
+  setVisitedBySnake() {
+    this.visitedBySnake = true;
+  }
+
+  getNoBridge() {
+    return this.noBridge;
+  }
+
+  getIsIronBridge() {
+    return this.isIronBridge;
+  }
+
+  getIsLava() {
+    return this.isLava;
+  }
 }
 
-function fillArrays() {
+function resetPuzzle() {
+  islands = [];
+  corners = [];
+  horizontalBorders = [];
+  verticalBorders = [];
+  playerPosition = { row: INITIAL_PLAYER_POSITION.row, column: INITIAL_PLAYER_POSITION.column };
+  snakePosition = { row: INITIAL_SNAKE_POSITION.row, column: INITIAL_SNAKE_POSITION.column };
+  pathLength = 0;
+
   for (let row = 0; row < GRID_HEIGHT; row += 1) {
     islands.push([]);
 
@@ -148,10 +192,19 @@ function fillArrays() {
       verticalBorders[row].push(new Border(row, column, BorderType.VERTICAL));
     }
   }
+
+  verticalBorders[0][2].noBridge = true;
+  verticalBorders[1][2].isLava = true;
+  verticalBorders[2][4].isIronBridge = true;
+  verticalBorders[3][1].isIronBridge = true;
+  verticalBorders[4][1].isLava = true;
+  verticalBorders[4][1].noBridge = true;
+  verticalBorders[4][2].noBridge = true;
+
+  Corner.getCornerForPosition(INITIAL_SNAKE_POSITION).visitedBySnake = true;
 }
 
-// Fill all arrays when page is loaded
-fillArrays();
+resetPuzzle();
 
 const DIRECTION_COMMANDS = {
   [Direction.NORTH]: ['n', 'north'],
@@ -161,6 +214,8 @@ const DIRECTION_COMMANDS = {
 };
 
 const MAP_COMMANDS = ['m', 'map'];
+
+const RESET_COMMAND = 'reset';
 
 const ALL_DIRECTION_COMMANDS = Object.values(DIRECTION_COMMANDS).flat();
 
@@ -186,6 +241,10 @@ function processCommand(command) {
   if (MAP_COMMANDS.includes(command)) {
     return processMapCommand();
   }
+  if (command === RESET_COMMAND) {
+    resetPuzzle();
+    return singleLineResponse('Puzzle reset!');
+  }
 
   return singleLineResponse('Invalid command!');
 }
@@ -195,10 +254,18 @@ function processMoveCommand(command) {
     direction => DIRECTION_COMMANDS[direction].includes(command)
   );
   const currentIsland = Island.getIslandForPosition(playerPosition);
-  const newIsland = currentIsland.getIsland(direction);
 
+  const newIsland = currentIsland.getIsland(direction);
   if (!newIsland) {
     return singleLineResponse('There is no island in that direction!');
+  }
+
+  const border = currentIsland.getBorder(direction);
+  if (border.getNoBridge()) {
+    return singleLineResponse('There is no bridge in that direction!');
+  }
+  if (border.getVisitedBySnake() && !border.getIsIronBridge()) {
+    return singleLineResponse('The bridge in that direction has been destroyed!');
   }
 
   const vector = DIRECTION_VECTORS[direction];
@@ -206,6 +273,34 @@ function processMoveCommand(command) {
   playerPosition.column += vector.column;
 
   return singleLineResponse('Moved!');
+}
+
+function tryMoveSnake(direction) {
+  const currentCorner = Corner.getCornerForPosition(snakePosition);
+
+  const newCorner = currentCorner.getCorner(direction);
+  if (!newCorner) {
+    return false;
+  }
+  if (newCorner.getVisitedBySnake() && (pathLength <= 1 || !newCorner.isInitialSnakePosition())) {
+    return false;
+  }
+
+  const border = currentCorner.getBorder(direction);
+  if (border.getIsLava()) {
+    return false;
+  }
+
+  const vector = DIRECTION_VECTORS[direction];
+  snakePosition.row += vector.row;
+  snakePosition.column += vector.column;
+
+  newCorner.setVisitedBySnake();
+  border.setVisitedBySnake();
+
+  pathLength += 1;
+
+  return true;
 }
 
 const MAP_TABLE_CELL_SIZE = 60;
