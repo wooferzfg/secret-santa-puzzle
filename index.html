@@ -1,27 +1,30 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <title></title>
-        <link href='https://fonts.googleapis.com/css?family=Fira+Sans' rel='stylesheet' type='text/css'>
-        <link rel="stylesheet" href="main.css">
-        <meta name="viewport" content="width=device-width">
-        <script src="script.js"></script>
-    </head>
-    <body>
-        <div class="main-container">
-            <div class="main-container-inner">
-                <div id="response-text"></div>
-                <form onsubmit="sendCommand(event)">
-                    <div class="command-container">
-                        <div class="command-input-container">
-                            <input id="command-input" placeholder="Command"/>
-                        </div>
-                        <button type="submit" class="send-command-button">
-                            Send
-                        </button>
-                    </div>
-                </form>
-            </div>
+
+<head>
+  <title></title>
+  <link href='https://fonts.googleapis.com/css?family=Fira+Sans' rel='stylesheet' type='text/css'>
+  <link rel="stylesheet" href="main.css">
+  <meta name="viewport" content="width=device-width">
+  <script src="script.js"></script>
+</head>
+
+<body>
+  <div class="main-container">
+    <div class="main-container-inner">
+      <div id="response-text"></div>
+      <form onsubmit="sendCommand(event)">
+        <div class="command-container">
+          <div class="command-input-container">
+            <input id="command-input" placeholder="Command" />
+          </div>
+          <button type="submit" class="send-command-button">
+            Send
+          </button>
         </div>
-    </body>
+      </form>
+    </div>
+  </div>
+</body>
+
 </html>

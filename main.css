@@ -1,63 +1,66 @@
 body {
-    margin: 0 auto;
+  margin: 0 auto;
 }
 
-html, body {
-    height: 100%;
+html,
+body {
+  height: 100%;
 }
 
-html, input, button {
-    font-size: 24px;
-    font-family: Fira Sans;
+html,
+input,
+button {
+  font-size: 24px;
+  font-family: Fira Sans;
 }
 
 .main-container {
-    width: 100%;
-    height: 100%;
-    display: flex;
-    justify-content: center;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
 }
 
 .main-container-inner {
-    max-width: 1000px;
-    width: calc(100% - 30px);
-    height: calc(100% - 30px);
-    padding: 15px;
+  max-width: 1000px;
+  width: calc(100% - 30px);
+  height: calc(100% - 30px);
+  padding: 15px;
 }
 
 #response-text {
-    width: calc(100% - 60px);
-    height: calc(100% - 160px);
-    overflow: scroll;
-    background-color: #EEEEEE;
-    margin-bottom: 30px;
-    padding: 15px 30px;
+  width: calc(100% - 60px);
+  height: calc(100% - 160px);
+  overflow: scroll;
+  background-color: #EEEEEE;
+  margin-bottom: 30px;
+  padding: 15px 30px;
 }
 
 .command-container {
-    width: 100%;
-    height: 100px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    flex-wrap: wrap;
+  width: 100%;
+  height: 100px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
 }
 
 .command-input-container {
-    margin-right: 5px;
-    margin-bottom: 5px;
+  margin-right: 5px;
+  margin-bottom: 5px;
 }
 
 .send-command-button {
-    margin-bottom: 5px;
+  margin-bottom: 5px;
 }
 
 #response-text .response-line {
-    padding: 15px 0;
-    border-bottom: 1px dashed #888888;
-    overflow-wrap: break-word;
+  padding: 15px 0;
+  border-bottom: 1px dashed #888888;
+  overflow-wrap: break-word;
 }
 
 #response-text .response-line:last-child {
-    border-bottom: none;
+  border-bottom: none;
 }
