@@ -108,6 +108,11 @@ class Border {
     this.row = row;
     this.column = column;
     this.type = type;
+    this.visitedBySnake = false;
+  }
+
+  getVisitedBySnake() {
+    return this.visitedBySnake;
   }
 }
 
@@ -155,6 +160,8 @@ const DIRECTION_COMMANDS = {
   [Direction.WEST]: ['w', 'west'],
 };
 
+const MAP_COMMANDS = ['m', 'map'];
+
 const ALL_DIRECTION_COMMANDS = Object.values(DIRECTION_COMMANDS).flat();
 
 function sendCommand(event) {
@@ -166,14 +173,18 @@ function sendCommand(event) {
   commandInput.value = '';
 
   if (command) {
+    const commandDisplay = commandDisplayElements(command);
     const responseLines = processCommand(command.trim().toLowerCase());
-    addResponse(responseLines);
+    addResponse(commandDisplay.concat(responseLines));
   }
 }
 
 function processCommand(command) {
   if (ALL_DIRECTION_COMMANDS.includes(command)) {
     return processMoveCommand(command);
+  }
+  if (MAP_COMMANDS.includes(command)) {
+    return processMapCommand();
   }
 
   return singleLineResponse('Invalid command!');
@@ -197,6 +208,81 @@ function processMoveCommand(command) {
   return singleLineResponse('Moved!');
 }
 
+const MAP_TABLE_CELL_SIZE = 60;
+const SNAKE_POSITION_CIRCLE_SIZE = 20;
+
+function processMapCommand() {
+  const mapTable = document.createElement('table');
+  addClass(mapTable, 'map-table');
+
+  const mapTableBody = document.createElement('tbody');
+  mapTable.appendChild(mapTableBody);
+
+  for (let row = 0; row < GRID_HEIGHT; row += 1) {
+    const rowElement = document.createElement('tr');
+    mapTableBody.appendChild(rowElement);
+
+    for (let column = 0; column < GRID_WIDTH; column += 1) {
+      const columnElement = document.createElement('td');
+      addClass(columnElement, 'map-table-cell');
+      rowElement.appendChild(columnElement);
+
+      const island = Island.getIslandForPosition({ row, column });
+      const topBorder = island.getBorder(Direction.NORTH);
+      const leftBorder = island.getBorder(Direction.WEST);
+      const bottomBorder = island.getBorder(Direction.SOUTH);
+      const rightBorder = island.getBorder(Direction.EAST);
+
+      if (topBorder.getVisitedBySnake()) {
+        if (row === 0) {
+          addClass(columnElement, 'top-border-snake');
+        } else {
+          addClass(columnElement, 'shrink-top-padding');
+        }
+      }
+      if (leftBorder.getVisitedBySnake()) {
+        if (column === 0) {
+          addClass(columnElement, 'left-border-snake');
+        } else {
+          addClass(columnElement, 'shrink-left-padding');
+        }
+      }
+      if (bottomBorder.getVisitedBySnake()) {
+        addClass(columnElement, 'bottom-border-snake');
+      }
+      if (rightBorder.getVisitedBySnake()) {
+        addClass(columnElement, 'right-border-snake');
+      }
+      
+
+      const cellContent = document.createElement('div');
+      addClass(cellContent, 'map-table-cell-inner');
+      columnElement.appendChild(cellContent);
+
+      if (row === playerPosition.row && column === playerPosition.column) {
+        const positionMarker = document.createElement('div');
+        positionMarker.innerText = '\u2605';
+        addClass(positionMarker, 'position-marker');
+        cellContent.appendChild(positionMarker);
+      }
+    }
+  }
+
+  const snakePositionCircle = document.createElement('div');
+  addClass(snakePositionCircle, 'snake-position');
+  snakePositionCircle.style.left = `${snakePosition.column * MAP_TABLE_CELL_SIZE - SNAKE_POSITION_CIRCLE_SIZE / 2}px`;
+  snakePositionCircle.style.top = `${snakePosition.row * MAP_TABLE_CELL_SIZE - SNAKE_POSITION_CIRCLE_SIZE / 2}px`;
+  mapTable.appendChild(snakePositionCircle);
+
+  return [mapTable];
+}
+
+function commandDisplayElements(command) {
+  const textElement = createResponseTextLine(`> ${command}`);
+  addClass(textElement, 'command-display');
+  return [textElement];
+}
+
 function singleLineResponse(line) {
   return [createResponseTextLine(line)];
 }
@@ -209,13 +295,21 @@ function createResponseTextLine(text) {
 
 function createResponseLineElement(childElements) {
   const responseLine = document.createElement('div');
-  responseLine.className = 'response-line';
+  addClass(responseLine, 'response-line');
 
   for (let i = 0; i < childElements.length; i++) {
     responseLine.appendChild(childElements[i]);
   }
 
   return responseLine;
+}
+
+function addClass(element, className) {
+  if (element.className) {
+    element.className += ` ${className}`;
+  } else {
+    element.className = className;
+  }
 }
 
 function addResponse(childElements) {

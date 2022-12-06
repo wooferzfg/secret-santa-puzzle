@@ -64,3 +64,68 @@ button {
 #response-text .response-line:last-child {
   border-bottom: none;
 }
+
+#response-text .command-display {
+  margin-bottom: 20px;
+}
+
+.map-table {
+  border-collapse: collapse;
+  position: relative;
+}
+
+.map-table-cell {
+  border: 2px dashed #4e4e4e;
+  padding: 4px;
+}
+
+.map-table-cell-inner {
+  width: 50px;
+  height: 50px;
+  
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.position-marker {
+  font-weight: bold;
+  text-align: center;
+  color: #508aff
+}
+
+.map-table .snake-position {
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background-color: #be78ff;
+}
+
+.map-table-cell.bottom-border-snake {
+  border-bottom: 5px solid #be78ff;
+  padding-bottom: 2.5px;
+}
+
+.map-table-cell.top-border-snake {
+  border-top: 5px solid #be78ff;
+  padding-top: 2.5px;
+}
+
+.map-table-cell.left-border-snake {
+  border-left: 5px solid #be78ff;
+  padding-left: 2.5px;
+}
+
+.map-table-cell.right-border-snake {
+  border-right: 5px solid #be78ff;
+  padding-right: 2.5px;
+}
+
+.map-table-cell.shrink-top-padding {
+  padding-top: 2.5px;
+}
+
+.map-table-cell.shrink-left-padding {
+  padding-left: 2.5px;
+}
