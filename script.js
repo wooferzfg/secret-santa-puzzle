@@ -44,6 +44,7 @@ let verticalBorders;
 let playerPosition;
 let snakePosition;
 let pathLength;
+let gameWon;
 
 const GRID_WIDTH = 5;
 const GRID_HEIGHT = 5;
@@ -52,6 +53,8 @@ class Island {
   constructor(row, column) {
     this.row = row;
     this.column = column;
+    this.buttonDirection = null;
+    this.requiredSnakeVisits = null;
   }
 
   getCorner(cornerDirection) {
@@ -73,6 +76,35 @@ class Island {
   getIsland(direction) {
     const vector = DIRECTION_VECTORS[direction];
     return islands[this.row + vector.row]?.[this.column + vector.column];
+  }
+
+  hasButton() {
+    return this.buttonDirection !== null;
+  }
+
+  getButtonDirection() {
+    return this.buttonDirection;
+  }
+
+  countSnakeVisits() {
+    let totalVisits = 0;
+
+    ALL_DIRECTIONS.forEach((direction) => {
+      const border = this.getBorder(direction);
+      if (border.getVisitedBySnake()) {
+        totalVisits += 1;
+      }
+    });
+
+    return totalVisits;
+  }
+
+  hasRequiredSnakeVisits() {
+    return this.requiredSnakeVisits !== null;
+  }
+
+  getRequiredSnakeVisits() {
+    return this.requiredSnakeVisits;
   }
 
   static getIslandForPosition(position) {
@@ -160,6 +192,7 @@ function resetPuzzle() {
   playerPosition = { row: INITIAL_PLAYER_POSITION.row, column: INITIAL_PLAYER_POSITION.column };
   snakePosition = { row: INITIAL_SNAKE_POSITION.row, column: INITIAL_SNAKE_POSITION.column };
   pathLength = 0;
+  gameWon = false;
 
   for (let row = 0; row < GRID_HEIGHT; row += 1) {
     islands.push([]);
@@ -201,6 +234,18 @@ function resetPuzzle() {
   verticalBorders[4][1].noBridge = true;
   verticalBorders[4][2].noBridge = true;
 
+  islands[0][0].requiredSnakeVisits = 2;
+  islands[0][1].requiredSnakeVisits = 3;
+  islands[1][1].requiredSnakeVisits = 1;
+  islands[1][2].requiredSnakeVisits = 1;
+  islands[2][4].requiredSnakeVisits = 2;
+  islands[4][4].requiredSnakeVisits = 1;
+
+  islands[0][0].buttonDirection = Direction.WEST;
+  islands[0][2].buttonDirection = Direction.EAST;
+  islands[4][0].buttonDirection = Direction.SOUTH;
+  islands[4][3].buttonDirection = Direction.NORTH;
+
   Corner.getCornerForPosition(INITIAL_SNAKE_POSITION).visitedBySnake = true;
 }
 
@@ -212,10 +257,9 @@ const DIRECTION_COMMANDS = {
   [Direction.SOUTH]: ['s', 'south'],
   [Direction.WEST]: ['w', 'west'],
 };
-
 const MAP_COMMANDS = ['m', 'map'];
-
-const RESET_COMMAND = 'reset';
+const PUSH_COMMANDS = ['p', 'push'];
+const RESET_COMMANDS = ['reset', 'restart'];
 
 const ALL_DIRECTION_COMMANDS = Object.values(DIRECTION_COMMANDS).flat();
 
@@ -241,7 +285,10 @@ function processCommand(command) {
   if (MAP_COMMANDS.includes(command)) {
     return processMapCommand();
   }
-  if (command === RESET_COMMAND) {
+  if (PUSH_COMMANDS.includes(command)) {
+    return processPushCommand();
+  }
+  if (RESET_COMMANDS.includes(command)) {
     resetPuzzle();
     return singleLineResponse('Puzzle reset!');
   }
@@ -275,20 +322,50 @@ function processMoveCommand(command) {
   return singleLineResponse('Moved!');
 }
 
+function processPushCommand() {
+  const currentIsland = Island.getIslandForPosition(playerPosition);
+  if (!currentIsland.hasButton()) {
+    return singleLineResponse('This island does not have a button!');
+  }
+
+  const direction = currentIsland.getButtonDirection();
+  const snakeMove = tryMoveSnake(direction);
+
+  if (!snakeMove.result) {
+    return singleLineResponse('The snake cannot move there!');
+  } else {
+    const newCorner = snakeMove.newCorner;
+    if (newCorner.isInitialSnakePosition()) {
+      if (validateSnake()) {
+        gameWon = true;
+
+        document.getElementById('command-container').remove();
+
+        return [createResponseTextLine('You win!'), drawMap()];
+      }
+
+      resetPuzzle();
+      return singleLineResponse('Incorrect solution! Puzzle reset!');
+    } else {
+      return singleLineResponse('The snake moved!');
+    }
+  }
+}
+
 function tryMoveSnake(direction) {
   const currentCorner = Corner.getCornerForPosition(snakePosition);
 
   const newCorner = currentCorner.getCorner(direction);
   if (!newCorner) {
-    return false;
+    return { result: false };
   }
   if (newCorner.getVisitedBySnake() && (pathLength <= 1 || !newCorner.isInitialSnakePosition())) {
-    return false;
+    return { result: false };
   }
 
   const border = currentCorner.getBorder(direction);
   if (border.getIsLava()) {
-    return false;
+    return { result: false };
   }
 
   const vector = DIRECTION_VECTORS[direction];
@@ -300,6 +377,18 @@ function tryMoveSnake(direction) {
 
   pathLength += 1;
 
+  return { result: true, newCorner };
+}
+
+function validateSnake() {
+  for (let row = 0; row < GRID_HEIGHT; row += 1) {
+    for (let column = 0; column < GRID_WIDTH; column += 1) {
+      const island = Island.getIslandForPosition({ row, column });
+      if (island.hasRequiredSnakeVisits() && island.countSnakeVisits() !== island.getRequiredSnakeVisits()) {
+        return false;
+      }
+    }
+  }
   return true;
 }
 
@@ -307,12 +396,21 @@ const MAP_TABLE_CELL_SIZE = 60;
 const SNAKE_POSITION_CIRCLE_SIZE = 20;
 
 function processMapCommand() {
+  const mapTable = drawMap();
+  return [mapTable];
+}
+
+function drawMap() {
   const mapTable = document.createElement('table');
   addClass(mapTable, 'map-table');
 
+  if (gameWon) {
+    addClass(mapTable, 'margin-above-map');
+  }
+
   const mapTableBody = document.createElement('tbody');
   mapTable.appendChild(mapTableBody);
-
+  
   for (let row = 0; row < GRID_HEIGHT; row += 1) {
     const rowElement = document.createElement('tr');
     mapTableBody.appendChild(rowElement);
@@ -348,28 +446,36 @@ function processMapCommand() {
       if (rightBorder.getVisitedBySnake()) {
         addClass(columnElement, 'right-border-snake');
       }
-      
 
       const cellContent = document.createElement('div');
       addClass(cellContent, 'map-table-cell-inner');
       columnElement.appendChild(cellContent);
 
-      if (row === playerPosition.row && column === playerPosition.column) {
+      if (!gameWon && row === playerPosition.row && column === playerPosition.column) {
         const positionMarker = document.createElement('div');
         positionMarker.innerText = '\u2605';
         addClass(positionMarker, 'position-marker');
         cellContent.appendChild(positionMarker);
       }
+
+      if (gameWon && island.hasRequiredSnakeVisits()) {
+        const requiredSnakeVisits = document.createElement('div');
+        requiredSnakeVisits.innerText = island.getRequiredSnakeVisits();
+        addClass(requiredSnakeVisits, 'required-snake-visits');
+        cellContent.appendChild(requiredSnakeVisits);
+      }
     }
   }
 
-  const snakePositionCircle = document.createElement('div');
-  addClass(snakePositionCircle, 'snake-position');
-  snakePositionCircle.style.left = `${snakePosition.column * MAP_TABLE_CELL_SIZE - SNAKE_POSITION_CIRCLE_SIZE / 2}px`;
-  snakePositionCircle.style.top = `${snakePosition.row * MAP_TABLE_CELL_SIZE - SNAKE_POSITION_CIRCLE_SIZE / 2}px`;
-  mapTable.appendChild(snakePositionCircle);
+  if (!gameWon) {
+    const snakePositionCircle = document.createElement('div');
+    addClass(snakePositionCircle, 'snake-position');
+    snakePositionCircle.style.left = `${snakePosition.column * MAP_TABLE_CELL_SIZE - SNAKE_POSITION_CIRCLE_SIZE / 2}px`;
+    snakePositionCircle.style.top = `${snakePosition.row * MAP_TABLE_CELL_SIZE - SNAKE_POSITION_CIRCLE_SIZE / 2}px`;
+    mapTable.appendChild(snakePositionCircle);
+  }
 
-  return [mapTable];
+  return mapTable;
 }
 
 function commandDisplayElements(command) {
@@ -392,7 +498,7 @@ function createResponseLineElement(childElements) {
   const responseLine = document.createElement('div');
   addClass(responseLine, 'response-line');
 
-  for (let i = 0; i < childElements.length; i++) {
+  for (let i = 0; i < childElements.length; i += 1) {
     responseLine.appendChild(childElements[i]);
   }
 
@@ -419,3 +525,33 @@ function addResponse(childElements) {
 
   responseText.scrollTop = responseText.scrollHeight;
 }
+
+/*
+To test path only having 1 segment left:
+
+tryMoveSnake('east')
+tryMoveSnake('east')
+tryMoveSnake('south')
+tryMoveSnake('south')
+tryMoveSnake('east')
+tryMoveSnake('south')
+tryMoveSnake('west')
+tryMoveSnake('west')
+tryMoveSnake('north')
+tryMoveSnake('west')
+tryMoveSnake('north')
+tryMoveSnake('west')
+tryMoveSnake('south')
+tryMoveSnake('south')
+tryMoveSnake('east')
+tryMoveSnake('south')
+tryMoveSnake('west')
+tryMoveSnake('west')
+tryMoveSnake('north')
+tryMoveSnake('north')
+tryMoveSnake('north')
+tryMoveSnake('north')
+tryMoveSnake('east')
+tryMoveSnake('north')
+tryMoveSnake('east')
+*/

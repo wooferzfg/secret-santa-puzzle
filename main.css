@@ -37,7 +37,7 @@ button {
   padding: 15px 30px;
 }
 
-.command-container {
+#command-container {
   width: 100%;
   height: 100px;
   display: flex;
@@ -74,6 +74,10 @@ button {
   position: relative;
 }
 
+.map-table.margin-above-map {
+  margin-top: 20px;
+}
+
 .map-table-cell {
   border: 2px dashed #4e4e4e;
   padding: 4px;
@@ -91,7 +95,14 @@ button {
 .position-marker {
   font-weight: bold;
   text-align: center;
-  color: #508aff
+  color: #508aff;
+  font-size: 32px;
+}
+
+.required-snake-visits {
+  font-weight: bold;
+  text-align: center;
+  font-size: 32px;
 }
 
 .map-table .snake-position {
