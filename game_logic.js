@@ -55,6 +55,7 @@ class Island {
     this.column = column;
     this.buttonDirection = null;
     this.requiredSnakeVisits = null;
+    this.hintText = null;
   }
 
   getCorner(cornerDirection) {
@@ -84,6 +85,27 @@ class Island {
 
   getButtonDirection() {
     return this.buttonDirection;
+  }
+
+  hasEgg() {
+    return this.requiredSnakeVisits !== null;
+  }
+
+  getEggLetter() {
+    const eggMapping = {
+      1: 'I',
+      2: 'A',
+      3: 'M',
+    };
+    return eggMapping[this.requiredSnakeVisits];
+  }
+
+  hasHintText() {
+    return this.hintText !== null;
+  }
+
+  getHintText() {
+    return this.hintText;
   }
 
   countSnakeVisits() {
@@ -185,7 +207,7 @@ class Border {
 }
 
 GAME_START_RESPONSE = 'You wake up and find yourself on a square shaped island. The island is surrounded by a large moat on all sides. You see many similar islands in the distance.';
-RESTART_INFO = 'At any time, if you would like to restart the game, type "restart".';
+RESTART_INFO = 'At any time, if you would like to restart the game, type \'restart\'.';
 AFTER_MOVING_RESPONSE = 'You cross the bridge, and you are now on a different square shaped island.'
 
 function resetPuzzle() {
@@ -249,6 +271,11 @@ function resetPuzzle() {
   islands[0][2].buttonDirection = Direction.EAST;
   islands[4][0].buttonDirection = Direction.SOUTH;
   islands[4][3].buttonDirection = Direction.NORTH;
+
+  islands[1][0].hintText = 'The snake\'s eggs count the sides of the island the snake must visit';
+  islands[1][3].hintText = 'Perhaps a \'map\' could be useful';
+  islands[2][2].hintText = 'All you need for a command is one letter. \'p\' is the same as \'push\'';
+  islands[3][3].hintText = 'The snake must visit all its eggs and return home';
 
   Corner.getCornerForPosition(INITIAL_SNAKE_POSITION).visitedBySnake = true;
 }
@@ -341,7 +368,7 @@ function processPushCommand() {
   const snakeMove = tryMoveSnake(direction);
 
   if (!snakeMove.result) {
-    return singleLineResponse('The snake cannot move there!');
+    return singleLineResponse('The button buzzes loudly, as if it is rejecting you.');
   } else {
     const newCorner = snakeMove.newCorner;
     if (newCorner.isInitialSnakePosition()) {
@@ -350,11 +377,22 @@ function processPushCommand() {
 
         document.getElementById('command-container').remove();
 
-        return [createResponseTextLine('You win!'), drawMap()];
+        return [
+          createResponseTextLine('The snake slithers, as its head links with its tail.'),
+          createResponseTextLine('Congratulations, you have completed the puzzle!'),
+          drawMap(),
+        ];
       }
 
       resetPuzzle();
-      return singleLineResponse('Incorrect solution! Puzzle reset!');
+      return multipleLineResponse(
+        [
+          'You hear a loud hiss. Something is wrong.',
+          'A dense white fog surrounds you, and you suddenly start feeling tired...',
+          '',
+          GAME_START_RESPONSE,
+        ].concat(describeCurrentIsland())
+      );
     } else {
       return singleLineResponse('The snake moved!');
     }
@@ -499,7 +537,7 @@ function drawMap() {
 
 function formatDirections(directions, conjunction = 'and', withQuotes = false) {
   if (withQuotes) {
-    directions = directions.map((direction) => `"${direction}"`);
+    directions = directions.map((direction) => `'${direction}'`);
   }
 
   if (directions.length === 1) {
@@ -522,6 +560,10 @@ function pluralize(singular, plural, directions) {
     return plural;
   }
   return singular;
+}
+
+function buttonLetter(direction) {
+  return direction[0].toUpperCase();
 }
 
 function describeCurrentIsland() {
@@ -567,6 +609,12 @@ function describeCurrentIsland() {
     }
   });
 
+  islandLines = [
+    currentIsland.hasButton() ? `On a pedestal, there is a button with the letter ${buttonLetter(currentIsland.getButtonDirection())} on it. Type \'push\' to push the button.` : null,
+    currentIsland.hasEgg() ? `On the ground, there is a large egg with the letter ${currentIsland.getEggLetter()} engraved on it.` : null,
+    currentIsland.hasHintText() ? `In the middle of the island, there is a stone tablet that reads: "${currentIsland.getHintText()}."` : null,
+  ].filter((line) => line !== null);
+
   borderLines = [
     islandDirs.length > 0 ? `There ${pluralize('is another island', 'are other islands', islandDirs)} to the ${formatDirections(islandDirs)}.` : null,
     ropeBridgeDirs.length > 0 ? `To the ${formatDirections(ropeBridgeDirs)}, there ${pluralize('is a', 'are', ropeBridgeDirs)} flimsy rope ${pluralize('bridge', 'bridges', ropeBridgeDirs)}.` : null,
@@ -582,13 +630,16 @@ function describeCurrentIsland() {
 
   const response = [];
 
+  if (islandLines.length > 0) {
+    response.push('', ...islandLines);
+  }
   if (borderLines.length > 0) {
     response.push('', ...borderLines);
   }
 
   response.push(
     '',
-    moveDirs.length > 0 ? `Type ${formatDirections(moveDirs, 'or', true)} to move in that direction.` : 'You cannot move. Type "restart" to restart the game.',
+    moveDirs.length > 0 ? `Type ${formatDirections(moveDirs, 'or', true)} to move in that direction.` : 'You cannot move. Type \'restart\' to restart the game.',
   );
 
   return response;
