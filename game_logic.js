@@ -184,6 +184,10 @@ class Border {
   }
 }
 
+GAME_START_RESPONSE = 'You wake up and find yourself on a square shaped island. The island is surrounded by a large moat on all sides. You see many similar islands in the distance.';
+RESTART_INFO = 'At any time, if you would like to restart the game, type "restart".';
+AFTER_MOVING_RESPONSE = 'You cross the bridge, and you are now on a different square shaped island.'
+
 function resetPuzzle() {
   islands = [];
   corners = [];
@@ -249,7 +253,7 @@ function resetPuzzle() {
   Corner.getCornerForPosition(INITIAL_SNAKE_POSITION).visitedBySnake = true;
 }
 
-resetPuzzle();
+window.onload = () => startGame();
 
 const DIRECTION_COMMANDS = {
   [Direction.NORTH]: ['n', 'north'],
@@ -265,7 +269,6 @@ const ALL_DIRECTION_COMMANDS = Object.values(DIRECTION_COMMANDS).flat();
 
 function sendCommand(event) {
   event.preventDefault();
-
 
   const commandInput = document.getElementById('command-input');
   const command = commandInput.value;
@@ -290,7 +293,13 @@ function processCommand(command) {
   }
   if (RESET_COMMANDS.includes(command)) {
     resetPuzzle();
-    return singleLineResponse('Puzzle reset!');
+    return multipleLineResponse(
+      [
+        'A dense white fog surrounds you, and you suddenly start feeling tired...',
+        '',
+        GAME_START_RESPONSE,
+      ].concat(describeCurrentIsland())
+    );
   }
 
   return singleLineResponse('Invalid command!');
@@ -304,28 +313,28 @@ function processMoveCommand(command) {
 
   const newIsland = currentIsland.getIsland(direction);
   if (!newIsland) {
-    return singleLineResponse('There is no island in that direction!');
+    return singleLineResponse('There is no island in that direction.');
   }
 
   const border = currentIsland.getBorder(direction);
   if (border.getNoBridge()) {
-    return singleLineResponse('There is no bridge in that direction!');
+    return singleLineResponse('There is no bridge in that direction.');
   }
   if (border.getVisitedBySnake() && !border.getIsIronBridge()) {
-    return singleLineResponse('The bridge in that direction has been destroyed!');
+    return singleLineResponse('The bridge in that direction has been destroyed.');
   }
 
   const vector = DIRECTION_VECTORS[direction];
   playerPosition.row += vector.row;
   playerPosition.column += vector.column;
 
-  return singleLineResponse('Moved!');
+  return multipleLineResponse([AFTER_MOVING_RESPONSE].concat(describeCurrentIsland()));
 }
 
 function processPushCommand() {
   const currentIsland = Island.getIslandForPosition(playerPosition);
   if (!currentIsland.hasButton()) {
-    return singleLineResponse('This island does not have a button!');
+    return singleLineResponse('This island does not have a button.');
   }
 
   const direction = currentIsland.getButtonDirection();
@@ -378,6 +387,16 @@ function tryMoveSnake(direction) {
   pathLength += 1;
 
   return { result: true, newCorner };
+}
+
+function startGame() {
+  resetPuzzle();
+
+  addResponse(
+    multipleLineResponse(
+      [GAME_START_RESPONSE].concat(describeCurrentIsland(), RESTART_INFO)
+    )
+  );
 }
 
 function validateSnake() {
@@ -478,6 +497,100 @@ function drawMap() {
   return mapTable;
 }
 
+function formatDirections(directions, conjunction = 'and', withQuotes = false) {
+  if (withQuotes) {
+    directions = directions.map((direction) => `"${direction}"`);
+  }
+
+  if (directions.length === 1) {
+    return directions[0];
+  }
+  if (directions.length === 2) {
+    return `${directions[0]} ${conjunction} ${directions[1]}`;
+  }
+  if (directions.length > 2) {
+    return `${directions.slice(0, directions.length - 1).join(', ')}, ${conjunction} ${directions[directions.length - 1]}`;
+  }
+  throw 'No valid directions!';
+}
+
+function pluralize(singular, plural, directions) {
+  if (!directions) {
+    throw 'No valid directions!';
+  }
+  if (directions.length > 1) {
+    return plural;
+  }
+  return singular;
+}
+
+function describeCurrentIsland() {
+  const currentIsland = Island.getIslandForPosition(playerPosition);
+
+  const moveDirs = [];
+  const ropeBridgeDirs = [];
+  const ironBridgeDirs = [];
+  const lavaDirsWithBridge = [];
+  const lavaDirsNoBridge = [];
+  const destroyedBridgeDirs = [];
+  const noBridgeDirs = [];
+
+  ALL_DIRECTIONS.forEach((direction) => {
+    const border = currentIsland.getBorder(direction);
+    const newIsland = currentIsland.getIsland(direction);
+
+    if (newIsland) {
+      if (border.getIsIronBridge() || (!border.getVisitedBySnake() && !border.getNoBridge())) {
+        moveDirs.push(direction);
+      }
+      if (!border.getIsIronBridge() && !border.getVisitedBySnake() && !border.getNoBridge()) {
+        ropeBridgeDirs.push(direction);
+      }
+      if (border.getIsIronBridge()) {
+        ironBridgeDirs.push(direction);
+      }
+      if (border.getIsLava()) {
+        if (border.getIsIronBridge() || (!border.getVisitedBySnake() && !border.getNoBridge())) {
+          lavaDirsWithBridge.push(direction);
+        } else {
+          lavaDirsNoBridge.push(direction);
+        }
+      }
+      if (!border.getIsIronBridge() && border.getVisitedBySnake() && !border.getNoBridge()) {
+        destroyedBridgeDirs.push(direction);
+      }
+      if (border.getNoBridge()) {
+        noBridgeDirs.push(direction);
+      }
+    }
+  });
+
+  borderLines = [
+    ropeBridgeDirs.length > 0 ? `To the ${formatDirections(ropeBridgeDirs)}, there ${pluralize('is a', 'are', ropeBridgeDirs)} flimsy rope ${pluralize('bridge', 'bridges', ropeBridgeDirs)}.` : null,
+    ironBridgeDirs.length > 0 ? (
+      `To the ${formatDirections(ironBridgeDirs)}, there ${pluralize('is an', 'are', ironBridgeDirs)} arched iron ${pluralize('bridge', 'bridges', ironBridgeDirs)}. ` +
+      'This type of bridge could survive heavy force from a large creature. The same cannot be said about a rope bridge.'
+    ) : null,
+    lavaDirsWithBridge.length > 0 ? `To the ${formatDirections(lavaDirsWithBridge)}, under the bridge, the moat is filled with lava. Not even the bravest of creatures would dare pass through it.` : null,
+    lavaDirsNoBridge.length > 0 ? `To the ${formatDirections(lavaDirsNoBridge)}, the moat is filled with lava. Not even the bravest of creatures would dare pass through it.` : null,
+    destroyedBridgeDirs.length > 0 ? `To the ${formatDirections(destroyedBridgeDirs)}, the wooden ${pluralize('bridge', 'bridges', destroyedBridgeDirs)} ${pluralize('has been', 'have been', destroyedBridgeDirs)} destroyed.` : null,
+    noBridgeDirs.length > 0 ? `There ${pluralize('is', 'are', noBridgeDirs)} no bridge to the ${formatDirections(noBridgeDirs)}.`: null,
+  ].filter((line) => line !== null);
+
+  const response = [];
+
+  if (borderLines.length > 0) {
+    response.push('', ...borderLines);
+  }
+
+  response.push(
+    '',
+    moveDirs.length > 0 ? `Type ${formatDirections(moveDirs, 'or', true)} to move in that direction.` : 'You cannot move. Type "restart" to restart the game.',
+  );
+
+  return response;
+}
+
 function commandDisplayElements(command) {
   const textElement = createResponseTextLine(`> ${command}`);
   addClass(textElement, 'command-display');
@@ -488,9 +601,18 @@ function singleLineResponse(line) {
   return [createResponseTextLine(line)];
 }
 
+function multipleLineResponse(lines) {
+  return lines.map((line) => createResponseTextLine(line));
+}
+
 function createResponseTextLine(text) {
   const textElement = document.createElement('div');
   textElement.innerText = text;
+
+  if (!text) {
+    addClass(textElement, 'empty-line');
+  }
+
   return textElement;
 }
 

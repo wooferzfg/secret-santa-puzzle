@@ -69,6 +69,10 @@ button {
   margin-bottom: 20px;
 }
 
+#response-text .empty-line {
+  height: 29px;
+}
+
 .map-table {
   border-collapse: collapse;
   position: relative;
