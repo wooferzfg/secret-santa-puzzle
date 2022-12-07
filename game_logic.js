@@ -56,6 +56,7 @@ class Island {
     this.buttonDirection = null;
     this.requiredSnakeVisits = null;
     this.hintText = null;
+    this.hasHamster = false;
   }
 
   getCorner(cornerDirection) {
@@ -127,6 +128,10 @@ class Island {
 
   getRequiredSnakeVisits() {
     return this.requiredSnakeVisits;
+  }
+
+  getHasHamster() {
+    return this.hasHamster;
   }
 
   static getIslandForPosition(position) {
@@ -213,6 +218,7 @@ class Border {
 GAME_START_RESPONSE = 'You wake up and find yourself on a small island. The island is surrounded by a large moat on all sides. You see many similar islands in the distance.';
 RESTART_INFO = 'At any time, if you would like to restart the game, type \'restart\'.';
 AFTER_MOVING_RESPONSE = 'You cross the bridge, and you are now on a different small island.'
+HAMSTER_INFO = 'In the middle of the island, there is a broken stone tablet. There is a hamster sitting on top of the tablet, muttering to themselves. Type \'talk\' to talk to the hamster.'
 
 function resetPuzzle() {
   islands = [];
@@ -281,6 +287,8 @@ function resetPuzzle() {
   islands[2][2].hintText = 'All you need for a command is one letter. \'p\' is the same as \'push\'';
   islands[3][3].hintText = 'The snake must visit all its eggs and return home';
 
+  islands[0][4].hasHamster = true;
+
   Corner.getCornerForPosition(INITIAL_SNAKE_POSITION).visitedBySnake = true;
 }
 
@@ -294,6 +302,7 @@ const DIRECTION_COMMANDS = {
 };
 const MAP_COMMANDS = ['m', 'map'];
 const PUSH_COMMANDS = ['p', 'push'];
+const TALK_COMMANDS = ['t', 'talk'];
 const RESET_COMMANDS = ['reset', 'restart'];
 
 const ALL_DIRECTION_COMMANDS = Object.values(DIRECTION_COMMANDS).flat();
@@ -321,6 +330,9 @@ function processCommand(command) {
   }
   if (PUSH_COMMANDS.includes(command)) {
     return processPushCommand();
+  }
+  if (TALK_COMMANDS.includes(command)) {
+    return processTalkCommand();
   }
   if (RESET_COMMANDS.includes(command)) {
     resetPuzzle();
@@ -365,7 +377,7 @@ function processMoveCommand(command) {
 function processPushCommand() {
   const currentIsland = Island.getIslandForPosition(playerPosition);
   if (!currentIsland.hasButton()) {
-    return singleLineResponse('This island does not have a button.');
+    return singleLineResponse('There is nothing to push on this island.');
   }
 
   const direction = currentIsland.getButtonDirection();
@@ -453,13 +465,45 @@ function validateSnake() {
   return true;
 }
 
-const MAP_TABLE_CELL_SIZE = 60;
-const SNAKE_POSITION_CIRCLE_SIZE = 20;
+function sudokuPuzzleLinkElement(linkText) {
+  const element = document.createElement('a');
+  element.href = 'https://tinyurl.com/2t2w6ee5';
+  element.target = '_blank';
+  element.innerText = linkText;
+  return element;
+}
+
+function processTalkCommand() {
+  const currentIsland = Island.getIslandForPosition(playerPosition);
+  if (!currentIsland.getHasHamster()) {
+    return singleLineResponse('There is no one to talk to on this island.');
+  }
+
+  return [
+    createResponseTextLine(
+      (
+        '"The stone tablet had a puzzle on it, before it was destroyed. ' +
+        'I remember the puzzle perfectly, but I was never able to figure out the solution. ' +
+        'The tablet said that the digits 1-6 need to be placed in every row, column, and box. ' +
+        'Also, neighboring digits on a gray line must be at least 3 apart. ' +
+        'I tried solving the puzzle with those rules, but I ended up with two different solutions. ' +
+        'I also never figured out the significance of the letters. ' +
+        'Maybe you could '
+      ),
+      'span',
+    ),
+    sudokuPuzzleLinkElement('try the puzzle yourself'),
+    createResponseTextLine('?"', 'span'),
+  ]
+}
 
 function processMapCommand() {
   const mapTable = drawMap();
   return [mapTable];
 }
+
+const MAP_TABLE_CELL_SIZE = 60;
+const SNAKE_POSITION_CIRCLE_SIZE = 20;
 
 function drawMap() {
   const mapTable = document.createElement('table');
@@ -673,6 +717,7 @@ function describeCurrentIsland() {
     currentIsland.hasButton() ? `On a pedestal in the middle of the island, there is a button with the letter ${buttonLetter(currentIsland.getButtonDirection())} on it. Type \'push\' to push the button.` : null,
     currentIsland.hasEgg() ? `${eggDescr} with the letter ${currentIsland.getEggLetter()} engraved on it.` : null,
     currentIsland.hasHintText() ? `In the middle of the island, there is a stone tablet that reads: "${currentIsland.getHintText()}."` : null,
+    currentIsland.getHasHamster() ? HAMSTER_INFO : null,
   ].filter((line) => line !== null);
 
   borderLines = [
@@ -730,8 +775,8 @@ function multipleLineResponse(lines) {
   return lines.map((line) => createResponseTextLine(line));
 }
 
-function createResponseTextLine(text) {
-  const textElement = document.createElement('div');
+function createResponseTextLine(text, elementType = 'div') {
+  const textElement = document.createElement(elementType);
   textElement.innerText = text;
 
   if (!text) {
