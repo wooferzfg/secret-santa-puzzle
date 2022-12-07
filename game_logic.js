@@ -169,6 +169,10 @@ class Corner {
     return this.row === INITIAL_SNAKE_POSITION.row && this.column === INITIAL_SNAKE_POSITION.column;
   }
 
+  hasSnakeHead() {
+    return this.row === snakePosition.row && this.column === snakePosition.column;
+  }
+
   static getCornerForPosition(position) {
     return corners[position.row]?.[position.column];
   }
@@ -206,9 +210,9 @@ class Border {
   }
 }
 
-GAME_START_RESPONSE = 'You wake up and find yourself on a square shaped island. The island is surrounded by a large moat on all sides. You see many similar islands in the distance.';
+GAME_START_RESPONSE = 'You wake up and find yourself on a small island. The island is surrounded by a large moat on all sides. You see many similar islands in the distance.';
 RESTART_INFO = 'At any time, if you would like to restart the game, type \'restart\'.';
-AFTER_MOVING_RESPONSE = 'You cross the bridge, and you are now on a different square shaped island.'
+AFTER_MOVING_RESPONSE = 'You cross the bridge, and you are now on a different small island.'
 
 function resetPuzzle() {
   islands = [];
@@ -273,7 +277,7 @@ function resetPuzzle() {
   islands[4][3].buttonDirection = Direction.NORTH;
 
   islands[1][0].hintText = 'The snake\'s eggs count the sides of the island the snake must visit';
-  islands[1][3].hintText = 'Perhaps a \'map\' could be useful';
+  islands[1][3].hintText = 'Perhaps a \'map\' could be useful for navigating the islands';
   islands[2][2].hintText = 'All you need for a command is one letter. \'p\' is the same as \'push\'';
   islands[3][3].hintText = 'The snake must visit all its eggs and return home';
 
@@ -639,6 +643,15 @@ function describeCurrentIsland() {
     snakeWithIronBridgeOnlyDirs = [];
   }
 
+  let snakeHeadDirection = null;
+  ALL_CORNER_DIRECTIONS.forEach((cornerDirection) => {
+    const corner = currentIsland.getCorner(cornerDirection);
+
+    if (corner.hasSnakeHead()) {
+      snakeHeadDirection = cornerDirection;
+    }
+  });
+
   islandLines = [
     currentIsland.hasButton() ? `On a pedestal, there is a button with the letter ${buttonLetter(currentIsland.getButtonDirection())} on it. Type \'push\' to push the button.` : null,
     currentIsland.hasEgg() ? `On the ground, there is a large egg with the letter ${currentIsland.getEggLetter()} engraved on it.` : null,
@@ -654,6 +667,7 @@ function describeCurrentIsland() {
     ) : null,
     lavaDirsWithBridge.length > 0 ? `To the ${formatDirections(lavaDirsWithBridge)}, under the bridge, the moat is filled with lava. Not even the bravest of creatures would dare pass through it.` : null,
     lavaDirsNoBridge.length > 0 ? `To the ${formatDirections(lavaDirsNoBridge)}, the moat is filled with lava. Not even the bravest of creatures would dare pass through it.` : null,
+    snakeHeadDirection ? `To the ${snakeHeadDirection}, a giant snake's head is in the moat.` : null,
     destroyedBridgeAndSnakeDirs.length > 0 ? `To the ${formatDirections(destroyedBridgeAndSnakeDirs)}, a giant snake's tail fills the moat, and the wooden ${pluralize('bridge has been', 'bridges have been', destroyedBridgeAndSnakeDirs)} destroyed.` : null,
     snakeBodyDirs.length > 0 ? `To the ${formatDirections(snakeBodyDirs)}, a giant snake's tail fills the moat.` : null,
     snakeWithIronBridgeOnlyDirs.length > 0 ? (
@@ -663,7 +677,7 @@ function describeCurrentIsland() {
       `To the ${formatDirections(ironBridgeAndSnakeDirs)}, above the snake's tail, there ${pluralize('is an', 'are', ironBridgeAndSnakeDirs)} arched iron ${pluralize('bridge', 'bridges', ironBridgeAndSnakeDirs)}.`
     ) : null,
     destroyedBridgeDirs.length > 0 ? `To the ${formatDirections(destroyedBridgeDirs)}, the wooden ${pluralize('bridge has been', 'bridges have been', destroyedBridgeDirs)} destroyed.` : null,
-    noBridgeDirs.length > 0 ? `There ${pluralize('is no bridge', 'are no bridges', noBridgeDirs)} to the ${formatDirections(noBridgeDirs, 'or')}.`: null,
+    noBridgeDirs.length > 0 ? `There ${pluralize('is no bridge', 'are no bridges', noBridgeDirs)} to the ${formatDirections(noBridgeDirs, 'or')}.` : null,
   ].filter((line) => line !== null);
 
   const response = [];
