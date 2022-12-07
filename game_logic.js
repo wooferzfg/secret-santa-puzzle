@@ -573,9 +573,11 @@ function describeCurrentIsland() {
   const islandDirs = [];
   const ropeBridgeDirs = [];
   const ironBridgeDirs = [];
+  let ironBridgeAndSnakeDirs = [];
   const lavaDirsWithBridge = [];
   const lavaDirsNoBridge = [];
-  const destroyedBridgeDirs = [];
+  let snakeBodyDirs = [];
+  let destroyedBridgeDirs = [];
   const noBridgeDirs = [];
 
   ALL_DIRECTIONS.forEach((direction) => {
@@ -591,7 +593,11 @@ function describeCurrentIsland() {
         ropeBridgeDirs.push(direction);
       }
       if (border.getIsIronBridge()) {
-        ironBridgeDirs.push(direction);
+        if (border.getVisitedBySnake()) {
+          ironBridgeAndSnakeDirs.push(direction);
+        } else {
+          ironBridgeDirs.push(direction);
+        }
       }
       if (border.getIsLava()) {
         if (border.getIsIronBridge() || (!border.getVisitedBySnake() && !border.getNoBridge())) {
@@ -600,14 +606,38 @@ function describeCurrentIsland() {
           lavaDirsNoBridge.push(direction);
         }
       }
-      if (!border.getIsIronBridge() && border.getVisitedBySnake() && !border.getNoBridge()) {
-        destroyedBridgeDirs.push(direction);
+      if (border.getVisitedBySnake()) {
+        snakeBodyDirs.push(direction);
+
+        if (!border.getIsIronBridge() && !border.getNoBridge()) {
+          destroyedBridgeDirs.push(direction);
+        }
+      } 
       }
       if (border.getNoBridge()) {
         noBridgeDirs.push(direction);
       }
-    }
   });
+
+  // If all bridges are destroyed by the snake, we combine the responses.
+  let destroyedBridgeAndSnakeDirs;
+  if (snakeBodyDirs.length === destroyedBridgeDirs.length) {
+    destroyedBridgeAndSnakeDirs = snakeBodyDirs;
+    snakeBodyDirs = [];
+    destroyedBridgeDirs = [];
+  } else {
+    destroyedBridgeAndSnakeDirs = [];
+  }
+
+  // If the only bridges under the snake are iron bridges, we combine the responses.
+  let snakeWithIronBridgeOnlyDirs;
+  if (ironBridgeAndSnakeDirs.length === snakeBodyDirs.length) {
+    snakeWithIronBridgeOnlyDirs = ironBridgeAndSnakeDirs;
+    ironBridgeAndSnakeDirs = [];
+    snakeBodyDirs = [];
+  } else {
+    snakeWithIronBridgeOnlyDirs = [];
+  }
 
   islandLines = [
     currentIsland.hasButton() ? `On a pedestal, there is a button with the letter ${buttonLetter(currentIsland.getButtonDirection())} on it. Type \'push\' to push the button.` : null,
@@ -620,10 +650,18 @@ function describeCurrentIsland() {
     ropeBridgeDirs.length > 0 ? `To the ${formatDirections(ropeBridgeDirs)}, there ${pluralize('is a', 'are', ropeBridgeDirs)} flimsy rope ${pluralize('bridge', 'bridges', ropeBridgeDirs)}.` : null,
     ironBridgeDirs.length > 0 ? (
       `To the ${formatDirections(ironBridgeDirs)}, there ${pluralize('is an', 'are', ironBridgeDirs)} arched iron ${pluralize('bridge', 'bridges', ironBridgeDirs)}. ` +
-      'This type of bridge could survive heavy force from a large creature. The same cannot be said about a rope bridge.'
+      'This type of bridge could survive a giant creature passing under it.'
     ) : null,
     lavaDirsWithBridge.length > 0 ? `To the ${formatDirections(lavaDirsWithBridge)}, under the bridge, the moat is filled with lava. Not even the bravest of creatures would dare pass through it.` : null,
     lavaDirsNoBridge.length > 0 ? `To the ${formatDirections(lavaDirsNoBridge)}, the moat is filled with lava. Not even the bravest of creatures would dare pass through it.` : null,
+    destroyedBridgeAndSnakeDirs.length > 0 ? `To the ${formatDirections(destroyedBridgeAndSnakeDirs)}, a giant snake's tail fills the moat, and the wooden ${pluralize('bridge has been', 'bridges have been', destroyedBridgeAndSnakeDirs)} destroyed.` : null,
+    snakeBodyDirs.length > 0 ? `To the ${formatDirections(snakeBodyDirs)}, a giant snake's tail fills the moat.` : null,
+    snakeWithIronBridgeOnlyDirs.length > 0 ? (
+      `To the ${formatDirections(snakeWithIronBridgeOnlyDirs)}, a giant snake's tail fills the moat. Above the snake's tail, there ${pluralize('is an', 'are', snakeWithIronBridgeOnlyDirs)} arched iron ${pluralize('bridge', 'bridges', snakeWithIronBridgeOnlyDirs)}.`
+    ) : null,
+    ironBridgeAndSnakeDirs.length > 0 ? (
+      `To the ${formatDirections(ironBridgeAndSnakeDirs)}, above the snake's tail, there ${pluralize('is an', 'are', ironBridgeAndSnakeDirs)} arched iron ${pluralize('bridge', 'bridges', ironBridgeAndSnakeDirs)}.`
+    ) : null,
     destroyedBridgeDirs.length > 0 ? `To the ${formatDirections(destroyedBridgeDirs)}, the wooden ${pluralize('bridge has been', 'bridges have been', destroyedBridgeDirs)} destroyed.` : null,
     noBridgeDirs.length > 0 ? `There ${pluralize('is no bridge', 'are no bridges', noBridgeDirs)} to the ${formatDirections(noBridgeDirs, 'or')}.`: null,
   ].filter((line) => line !== null);
