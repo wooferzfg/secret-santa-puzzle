@@ -574,7 +574,7 @@ function describeCurrentIsland() {
     lavaDirsWithBridge.length > 0 ? `To the ${formatDirections(lavaDirsWithBridge)}, under the bridge, the moat is filled with lava. Not even the bravest of creatures would dare pass through it.` : null,
     lavaDirsNoBridge.length > 0 ? `To the ${formatDirections(lavaDirsNoBridge)}, the moat is filled with lava. Not even the bravest of creatures would dare pass through it.` : null,
     destroyedBridgeDirs.length > 0 ? `To the ${formatDirections(destroyedBridgeDirs)}, the wooden ${pluralize('bridge', 'bridges', destroyedBridgeDirs)} ${pluralize('has been', 'have been', destroyedBridgeDirs)} destroyed.` : null,
-    noBridgeDirs.length > 0 ? `There ${pluralize('is', 'are', noBridgeDirs)} no bridge to the ${formatDirections(noBridgeDirs)}.`: null,
+    noBridgeDirs.length > 0 ? `There ${pluralize('is', 'are', noBridgeDirs)} no ${pluralize('bridge', 'bridges', noBridgeDirs)} to the ${formatDirections(noBridgeDirs)}.`: null,
   ].filter((line) => line !== null);
 
   const response = [];
