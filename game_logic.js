@@ -345,7 +345,7 @@ function processCommand(command) {
     );
   }
 
-  return singleLineResponse('Invalid command!');
+  return singleLineResponse('The command you entered is not valid.');
 }
 
 function processMoveCommand(command) {
@@ -386,7 +386,8 @@ function processPushCommand() {
   if (!snakeMove.result) {
     return singleLineResponse('The button buzzes loudly, as if it is rejecting you.');
   } else {
-    const newCorner = snakeMove.newCorner;
+    const { previousCorner, newCorner, lastBorder } = snakeMove;
+
     if (newCorner.isInitialSnakePosition()) {
       if (validateSnake()) {
         gameWon = true;
@@ -410,7 +411,7 @@ function processPushCommand() {
         ].concat(describeCurrentIsland())
       );
     } else {
-      return singleLineResponse('The snake moved!');
+      return snakeMovementResponse(previousCorner, newCorner, lastBorder, direction);
     }
   }
 }
@@ -440,7 +441,48 @@ function tryMoveSnake(direction) {
 
   pathLength += 1;
 
-  return { result: true, newCorner };
+  return {
+    result: true,
+    previousCorner: currentCorner,
+    newCorner,
+    lastBorder: border,
+  };
+}
+
+function snakeMovementResponse(previousCorner, newCorner, lastBorder, snakeDirection) {
+  const currentIsland = Island.getIslandForPosition(playerPosition);
+
+  let previousCornerDirection = null;
+  let newCornerDirection = null;
+  let lastBorderDirection = null;
+
+  ALL_DIRECTIONS.forEach((direction) => {
+    const border = currentIsland.getBorder(direction);
+    if (border === lastBorder) {
+      lastBorderDirection = direction;
+    }
+  });
+
+  ALL_CORNER_DIRECTIONS.forEach((cornerDirection) => {
+    const corner = currentIsland.getCorner(cornerDirection);
+    if (corner === previousCorner) {
+      previousCornerDirection = cornerDirection;
+    }
+    if (corner === newCorner) {
+      newCornerDirection = cornerDirection;
+    }
+  });
+
+  if (previousCornerDirection === null && newCornerDirection === null) {
+    return singleLineResponse('You hear something move in the distance.');
+  }
+  if (previousCornerDirection === null && newCornerDirection !== null) {
+    return singleLineResponse(
+      `You see a giant snake move through a moat in the distance, heading ${snakeDirection} until it stops at ` +
+      `the ${newCornerDirection} corner of the island you are on.`
+    );
+  }
+  return singleLineResponse(`${previousCornerDirection}, ${newCornerDirection}, ${lastBorderDirection}, ${snakeDirection}`);
 }
 
 function startGame() {
