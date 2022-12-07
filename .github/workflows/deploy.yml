@@ -19,6 +19,10 @@ jobs:
         aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
-    - name: Copy files to the S3 bucket with the AWS CLI
+    - name: Copy files to the S3 bucket
       run: |
-        aws s3 sync . s3://islands-puzzle --exclude ".git/*" --exclude ".github/*"
+        aws s3 sync . s3://${{ secrets.S3_BUCKET_NAME }} --exclude ".git/*" --exclude ".github/*"
+
+    - name: Create CloudFront invalidation
+      run: |
+        aws cloudfront create-invalidation --distribution-id ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }} --paths "/*"
