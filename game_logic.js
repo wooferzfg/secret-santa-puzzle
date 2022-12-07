@@ -695,7 +695,7 @@ function addResponse(childElements) {
   const responseLine = createResponseLineElement(childElements);
   responseText.appendChild(responseLine);
 
-  while (responseText.childElementCount > 20) {
+  while (responseText.childElementCount > 50) {
     responseText.removeChild(responseText.firstChild);
   }
 
