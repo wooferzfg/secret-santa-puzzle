@@ -528,6 +528,7 @@ function describeCurrentIsland() {
   const currentIsland = Island.getIslandForPosition(playerPosition);
 
   const moveDirs = [];
+  const islandDirs = [];
   const ropeBridgeDirs = [];
   const ironBridgeDirs = [];
   const lavaDirsWithBridge = [];
@@ -540,6 +541,7 @@ function describeCurrentIsland() {
     const newIsland = currentIsland.getIsland(direction);
 
     if (newIsland) {
+      islandDirs.push(direction);
       if (border.getIsIronBridge() || (!border.getVisitedBySnake() && !border.getNoBridge())) {
         moveDirs.push(direction);
       }
@@ -566,6 +568,7 @@ function describeCurrentIsland() {
   });
 
   borderLines = [
+    islandDirs.length > 0 ? `There ${pluralize('is another island', 'are other islands', islandDirs)} to the ${formatDirections(islandDirs)}.` : null,
     ropeBridgeDirs.length > 0 ? `To the ${formatDirections(ropeBridgeDirs)}, there ${pluralize('is a', 'are', ropeBridgeDirs)} flimsy rope ${pluralize('bridge', 'bridges', ropeBridgeDirs)}.` : null,
     ironBridgeDirs.length > 0 ? (
       `To the ${formatDirections(ironBridgeDirs)}, there ${pluralize('is an', 'are', ironBridgeDirs)} arched iron ${pluralize('bridge', 'bridges', ironBridgeDirs)}. ` +
@@ -573,8 +576,8 @@ function describeCurrentIsland() {
     ) : null,
     lavaDirsWithBridge.length > 0 ? `To the ${formatDirections(lavaDirsWithBridge)}, under the bridge, the moat is filled with lava. Not even the bravest of creatures would dare pass through it.` : null,
     lavaDirsNoBridge.length > 0 ? `To the ${formatDirections(lavaDirsNoBridge)}, the moat is filled with lava. Not even the bravest of creatures would dare pass through it.` : null,
-    destroyedBridgeDirs.length > 0 ? `To the ${formatDirections(destroyedBridgeDirs)}, the wooden ${pluralize('bridge', 'bridges', destroyedBridgeDirs)} ${pluralize('has been', 'have been', destroyedBridgeDirs)} destroyed.` : null,
-    noBridgeDirs.length > 0 ? `There ${pluralize('is', 'are', noBridgeDirs)} no ${pluralize('bridge', 'bridges', noBridgeDirs)} to the ${formatDirections(noBridgeDirs, 'or')}.`: null,
+    destroyedBridgeDirs.length > 0 ? `To the ${formatDirections(destroyedBridgeDirs)}, the wooden ${pluralize('bridge has been', 'bridges have been', destroyedBridgeDirs)} destroyed.` : null,
+    noBridgeDirs.length > 0 ? `There ${pluralize('is no bridge', 'are no bridges', noBridgeDirs)} to the ${formatDirections(noBridgeDirs, 'or')}.`: null,
   ].filter((line) => line !== null);
 
   const response = [];
