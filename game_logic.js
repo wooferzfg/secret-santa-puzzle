@@ -623,6 +623,8 @@ function describeCurrentIsland() {
       }
   });
 
+  const isSnakeBodyVisible = snakeBodyDirs.length > 0;
+
   // If all bridges are destroyed by the snake, we combine the responses.
   let destroyedBridgeAndSnakeDirs;
   if (snakeBodyDirs.length === destroyedBridgeDirs.length) {
@@ -644,13 +646,27 @@ function describeCurrentIsland() {
   }
 
   let snakeHeadDirection = null;
+  let snakeHeadAtBurrowDirection = null;
+  let snakeBodyAtBurrowDirection = null;
+  let isSnakeHeadVisible = false;
   ALL_CORNER_DIRECTIONS.forEach((cornerDirection) => {
     const corner = currentIsland.getCorner(cornerDirection);
 
     if (corner.hasSnakeHead()) {
-      snakeHeadDirection = cornerDirection;
+      isSnakeHeadVisible = true;
+
+      if (corner.isInitialSnakePosition()) {
+        snakeHeadAtBurrowDirection = cornerDirection;
+      } else {
+        snakeHeadDirection = cornerDirection;
+      }
+    } else if (corner.isInitialSnakePosition()) {
+      snakeBodyAtBurrowDirection = cornerDirection;
     }
   });
+
+  const snakeBodyDescr = isSnakeHeadVisible ? 'the snake' : 'a giant snake';
+  const snakeBodyAtBurrowDescr = isSnakeBodyVisible ? 'the snake' : 'a giant snake';
 
   islandLines = [
     currentIsland.hasButton() ? `On a pedestal, there is a button with the letter ${buttonLetter(currentIsland.getButtonDirection())} on it. Type \'push\' to push the button.` : null,
@@ -667,15 +683,17 @@ function describeCurrentIsland() {
     ) : null,
     lavaDirsWithBridge.length > 0 ? `To the ${formatDirections(lavaDirsWithBridge)}, under the bridge, the moat is filled with lava. Not even the bravest of creatures would dare pass through it.` : null,
     lavaDirsNoBridge.length > 0 ? `To the ${formatDirections(lavaDirsNoBridge)}, the moat is filled with lava. Not even the bravest of creatures would dare pass through it.` : null,
+    snakeHeadAtBurrowDirection ? `To the ${snakeHeadAtBurrowDirection}, a giant snake's head is peeking out of a large burrow in the moat.` : null,
     snakeHeadDirection ? `To the ${snakeHeadDirection}, a giant snake's head is in the moat.` : null,
-    destroyedBridgeAndSnakeDirs.length > 0 ? `To the ${formatDirections(destroyedBridgeAndSnakeDirs)}, a giant snake's tail fills the moat, and the wooden ${pluralize('bridge has been', 'bridges have been', destroyedBridgeAndSnakeDirs)} destroyed.` : null,
-    snakeBodyDirs.length > 0 ? `To the ${formatDirections(snakeBodyDirs)}, a giant snake's tail fills the moat.` : null,
+    destroyedBridgeAndSnakeDirs.length > 0 ? `To the ${formatDirections(destroyedBridgeAndSnakeDirs)}, ${snakeBodyDescr}'s body fills the moat, and the wooden ${pluralize('bridge has been', 'bridges have been', destroyedBridgeAndSnakeDirs)} destroyed.` : null,
+    snakeBodyDirs.length > 0 ? `To the ${formatDirections(snakeBodyDirs)}, ${snakeBodyDescr}'s body fills the moat.` : null,
     snakeWithIronBridgeOnlyDirs.length > 0 ? (
-      `To the ${formatDirections(snakeWithIronBridgeOnlyDirs)}, a giant snake's tail fills the moat. Above the snake's tail, there ${pluralize('is an', 'are', snakeWithIronBridgeOnlyDirs)} arched iron ${pluralize('bridge', 'bridges', snakeWithIronBridgeOnlyDirs)}.`
+      `To the ${formatDirections(snakeWithIronBridgeOnlyDirs)}, ${snakeBodyDescr}'s body fills the moat. Above the snake's body, there ${pluralize('is an', 'are', snakeWithIronBridgeOnlyDirs)} arched iron ${pluralize('bridge', 'bridges', snakeWithIronBridgeOnlyDirs)}.`
     ) : null,
     ironBridgeAndSnakeDirs.length > 0 ? (
-      `To the ${formatDirections(ironBridgeAndSnakeDirs)}, above the snake's tail, there ${pluralize('is an', 'are', ironBridgeAndSnakeDirs)} arched iron ${pluralize('bridge', 'bridges', ironBridgeAndSnakeDirs)}.`
+      `To the ${formatDirections(ironBridgeAndSnakeDirs)}, above the snake's body, there ${pluralize('is an', 'are', ironBridgeAndSnakeDirs)} arched iron ${pluralize('bridge', 'bridges', ironBridgeAndSnakeDirs)}.`
     ) : null,
+    snakeBodyAtBurrowDirection ? `To the ${snakeBodyAtBurrowDirection}, ${snakeBodyAtBurrowDescr}'s body emerges from a large burrow in the moat.` : null,
     destroyedBridgeDirs.length > 0 ? `To the ${formatDirections(destroyedBridgeDirs)}, the wooden ${pluralize('bridge has been', 'bridges have been', destroyedBridgeDirs)} destroyed.` : null,
     noBridgeDirs.length > 0 ? `There ${pluralize('is no bridge', 'are no bridges', noBridgeDirs)} to the ${formatDirections(noBridgeDirs, 'or')}.` : null,
   ].filter((line) => line !== null);
