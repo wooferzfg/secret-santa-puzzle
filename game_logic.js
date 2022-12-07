@@ -667,10 +667,11 @@ function describeCurrentIsland() {
 
   const snakeBodyDescr = isSnakeHeadVisible ? 'the snake' : 'a giant snake';
   const snakeBodyAtBurrowDescr = isSnakeBodyVisible ? 'the snake' : 'a giant snake';
+  const eggDescr = currentIsland.hasButton() ? 'At the foot of the pedestal, there is a large egg' : 'In the middle of the island, there is a large egg on the ground'
 
   islandLines = [
-    currentIsland.hasButton() ? `On a pedestal, there is a button with the letter ${buttonLetter(currentIsland.getButtonDirection())} on it. Type \'push\' to push the button.` : null,
-    currentIsland.hasEgg() ? `On the ground, there is a large egg with the letter ${currentIsland.getEggLetter()} engraved on it.` : null,
+    currentIsland.hasButton() ? `On a pedestal in the middle of the island, there is a button with the letter ${buttonLetter(currentIsland.getButtonDirection())} on it. Type \'push\' to push the button.` : null,
+    currentIsland.hasEgg() ? `${eggDescr} with the letter ${currentIsland.getEggLetter()} engraved on it.` : null,
     currentIsland.hasHintText() ? `In the middle of the island, there is a stone tablet that reads: "${currentIsland.getHintText()}."` : null,
   ].filter((line) => line !== null);
 
