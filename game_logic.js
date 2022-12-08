@@ -455,11 +455,20 @@ function snakeMovementResponse(previousCorner, newCorner, lastBorder, snakeDirec
   let previousCornerDirection = null;
   let newCornerDirection = null;
   let lastBorderDirection = null;
+  let exitingBurrow = false;
+  let anySnakeBodyBorders = false;
+  let lastBorderBridgeDestroyed = false;
 
   ALL_DIRECTIONS.forEach((direction) => {
     const border = currentIsland.getBorder(direction);
     if (border === lastBorder) {
       lastBorderDirection = direction;
+      if (!border.getIsIronBridge() && !border.getNoBridge()) {
+        lastBorderBridgeDestroyed = true;
+      }
+    }
+    if (border.getVisitedBySnake()) {
+      anySnakeBodyBorders = true;
     }
   });
 
@@ -467,6 +476,9 @@ function snakeMovementResponse(previousCorner, newCorner, lastBorder, snakeDirec
     const corner = currentIsland.getCorner(cornerDirection);
     if (corner === previousCorner) {
       previousCornerDirection = cornerDirection;
+      if (corner.isInitialSnakePosition()) {
+        exitingBurrow = true;
+      }
     }
     if (corner === newCorner) {
       newCornerDirection = cornerDirection;
@@ -474,15 +486,52 @@ function snakeMovementResponse(previousCorner, newCorner, lastBorder, snakeDirec
   });
 
   if (previousCornerDirection === null && newCornerDirection === null) {
+    if (anySnakeBodyBorders) {
+      return singleLineResponse('The giant snake moves forward, as its body continues to fill the moat. The snake\'s head is too far away for you to see.')
+    }
+
     return singleLineResponse('You hear something move in the distance.');
   }
   if (previousCornerDirection === null && newCornerDirection !== null) {
+    if (anySnakeBodyBorders) {
+      return singleLineResponse(
+        'The giant snake moves forward, as its body continues to fill the moat. The snake\'s head moves through a moat in the distance, ' +
+        `heading ${snakeDirection} until it stops at the ${newCornerDirection} corner of the island you are on.`
+      );
+    }
+
     return singleLineResponse(
-      `You see a giant snake move through a moat in the distance, heading ${snakeDirection} until it stops at ` +
+      `A giant snake moves through a moat in the distance, heading ${snakeDirection} until it stops at ` +
       `the ${newCornerDirection} corner of the island you are on.`
     );
   }
-  return singleLineResponse(`${previousCornerDirection}, ${newCornerDirection}, ${lastBorderDirection}, ${snakeDirection}`);
+  if (previousCornerDirection !== null && newCornerDirection === null) {
+    if (anySnakeBodyBorders) {
+      return singleLineResponse(
+        `The giant snake moves away from the ${previousCornerDirection} corner of the island and heads ${snakeDirection}, as its body continues to fill the moat.`
+      );
+    }
+
+    return singleLineResponse(
+      `The giant snake moves away from the ${previousCornerDirection} corner of the island and heads ${snakeDirection}.`
+    );
+  }
+  if (previousCornerDirection !== null && newCornerDirection !== null) {
+    const snakeBodyMoatLine = `The snake's body fills the moat to the ${lastBorderDirection} of the island${lastBorderBridgeDestroyed ? ', destroying the rope bridge that was there before.' : '.'}`;
+
+    if (exitingBurrow) {
+      return singleLineResponse(
+        `The giant snake emerges from the burrow, moving through the moat from the ${previousCornerDirection} corner to the ${newCornerDirection} corner of the island. ` +
+        snakeBodyMoatLine
+      )
+    }
+
+    return singleLineResponse(
+      `The giant snake moves through the moat from the ${previousCornerDirection} corner to the ${newCornerDirection} corner of the island. ` +
+      snakeBodyMoatLine
+    );
+  }
+  throw `Invalid snake movement: ${previousCornerDirection}, ${newCornerDirection}, ${lastBorderDirection}, ${snakeDirection}`;
 }
 
 function startGame() {
@@ -756,8 +805,8 @@ function describeCurrentIsland() {
   const eggDescr = currentIsland.hasButton() ? 'At the foot of the pedestal, there is a large egg' : 'In the middle of the island, there is a large egg on the ground'
 
   islandLines = [
-    currentIsland.hasButton() ? `On a pedestal in the middle of the island, there is a button with the letter ${buttonLetter(currentIsland.getButtonDirection())} on it. Type \'push\' to push the button.` : null,
-    currentIsland.hasEgg() ? `${eggDescr} with the letter ${currentIsland.getEggLetter()} engraved on it.` : null,
+    currentIsland.hasButton() ? `On a pedestal in the middle of the island, there is a button with the letter "${buttonLetter(currentIsland.getButtonDirection())}" on it. Type \'push\' to push the button.` : null,
+    currentIsland.hasEgg() ? `${eggDescr} with the letter "${currentIsland.getEggLetter()}" engraved on it.` : null,
     currentIsland.hasHintText() ? `In the middle of the island, there is a stone tablet that reads: "${currentIsland.getHintText()}."` : null,
     currentIsland.getHasHamster() ? HAMSTER_INFO : null,
   ].filter((line) => line !== null);
