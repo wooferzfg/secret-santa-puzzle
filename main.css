@@ -177,11 +177,7 @@ button {
 }
 
 @media all and (max-width: 372px) {
-  #command-container {
-    height: 100px;
-  }
-
-  #response-text-container {
-    height: calc(100% - 100px);
+  .send-command-button {
+    display: none;
   }
 }
