@@ -282,7 +282,7 @@ function resetPuzzle() {
   islands[4][0].buttonDirection = Direction.SOUTH;
   islands[4][3].buttonDirection = Direction.NORTH;
 
-  islands[1][0].hintText = 'The snake\'s eggs count the number of sides of the island the snake must visit';
+  islands[1][0].hintText = 'The snake\'s eggs count how many sides of the island the snake must visit';
   islands[1][3].hintText = 'Perhaps a \'map\' could be useful for navigating the islands';
   islands[2][2].hintText = 'All you need for a command is one letter. \'p\' is the same as \'push\'';
   islands[3][3].hintText = 'The snake must visit all its eggs and return home';
