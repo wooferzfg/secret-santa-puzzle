@@ -337,6 +337,7 @@ function processCommand(command) {
   }
   if (RESET_COMMANDS.includes(command)) {
     resetPuzzle();
+    updateMap();
     return multipleLineResponse(
       [
         'A dense white fog surrounds you, and you suddenly start feeling tired...',
@@ -390,11 +391,10 @@ function processPushCommand() {
   } else {
     const { previousCorner, newCorner, lastBorder } = snakeMove;
 
-    updateMap();
-
     if (newCorner.isInitialSnakePosition()) {
       if (validateSnake()) {
         gameWon = true;
+        updateMap();
 
         document.getElementById('command-container').remove();
         window.getSelection?.().empty?.(); // Deselect page text
@@ -407,6 +407,7 @@ function processPushCommand() {
       }
 
       resetPuzzle();
+      updateMap();
       return multipleLineResponse(
         [
           'You hear a loud hiss. Something is wrong.',
@@ -416,6 +417,7 @@ function processPushCommand() {
         ].concat(describeCurrentIsland())
       );
     } else {
+      updateMap();
       return snakeMovementResponse(previousCorner, newCorner, lastBorder, direction);
     }
   }
