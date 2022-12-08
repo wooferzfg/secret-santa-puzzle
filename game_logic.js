@@ -487,7 +487,7 @@ function snakeMovementResponse(previousCorner, newCorner, lastBorder, snakeDirec
 
   if (previousCornerDirection === null && newCornerDirection === null) {
     if (anySnakeBodyBorders) {
-      return singleLineResponse('The giant snake moves forward, as its body continues to fill the moat. The snake\'s head is too far away for you to see.')
+      return singleLineResponse('The giant snake moves forward, as its body still fills the moat. The snake\'s head is too far away for you to see.')
     }
 
     return singleLineResponse('You hear something move in the distance.');
@@ -495,7 +495,7 @@ function snakeMovementResponse(previousCorner, newCorner, lastBorder, snakeDirec
   if (previousCornerDirection === null && newCornerDirection !== null) {
     if (anySnakeBodyBorders) {
       return singleLineResponse(
-        'The giant snake moves forward, as its body continues to fill the moat. The snake\'s head moves through a moat in the distance, ' +
+        'The giant snake moves forward, as its body still fills the moat. The snake\'s head moves through a moat in the distance, ' +
         `heading ${snakeDirection} until it stops at the ${newCornerDirection} corner of the island you are on.`
       );
     }
@@ -508,7 +508,7 @@ function snakeMovementResponse(previousCorner, newCorner, lastBorder, snakeDirec
   if (previousCornerDirection !== null && newCornerDirection === null) {
     if (anySnakeBodyBorders) {
       return singleLineResponse(
-        `The giant snake moves away from the ${previousCornerDirection} corner of the island and heads ${snakeDirection}, as its body continues to fill the moat.`
+        `The giant snake moves away from the ${previousCornerDirection} corner of the island and heads ${snakeDirection}, as its body still fills the moat.`
       );
     }
 
