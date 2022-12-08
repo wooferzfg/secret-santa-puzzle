@@ -22,24 +22,27 @@ button {
 }
 
 .main-container-inner {
-  max-width: 1000px;
-  width: calc(100% - 30px);
-  height: calc(100% - 30px);
   padding: 15px;
 }
 
+#response-text-container {
+  width: 100%;
+  height: calc(100% - 50px);
+  display: flex;
+  justify-content: center;
+}
+
 #response-text {
-  width: calc(100% - 60px);
-  height: calc(100% - 160px);
-  overflow: scroll;
+  max-width: 1000px;
+  overflow-y: scroll;
   background-color: #EEEEEE;
-  margin-bottom: 30px;
+  margin-bottom: 20px;
   padding: 15px 30px;
 }
 
 #command-container {
   width: 100%;
-  height: 100px;
+  height: 50px;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -73,18 +76,24 @@ button {
   height: 29px;
 }
 
+#main-map {
+  display: block;
+  margin-left: 20px;
+}
+
 .map-table {
   border-collapse: collapse;
   position: relative;
 }
 
-.map-table.margin-above-map {
+.map-table.game-win-map {
   margin-top: 20px;
 }
 
 .map-table-cell {
   border: 2px dashed #4e4e4e;
   padding: 4px;
+  background-color: white;
 }
 
 .map-table-cell-inner {
@@ -143,4 +152,35 @@ button {
 
 .map-table-cell.shrink-left-padding {
   padding-left: 2.5px;
+}
+
+@media all and (max-width: 800px) {
+  #response-text-container {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  #response-text {
+    flex-grow: 1;
+    margin-bottom: 10px;
+  }
+
+  #main-map {
+    margin-bottom: 10px;
+    margin-left: 0;
+  }
+
+  .main-container-inner {
+    padding: 5px;
+  }
+}
+
+@media all and (max-width: 372px) {
+  #command-container {
+    height: 100px;
+  }
+
+  #response-text-container {
+    height: calc(100% - 100px);
+  }
 }

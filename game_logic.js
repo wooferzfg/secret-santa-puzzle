@@ -45,6 +45,7 @@ let playerPosition;
 let snakePosition;
 let pathLength;
 let gameWon;
+let mapData = null;
 
 const GRID_WIDTH = 5;
 const GRID_HEIGHT = 5;
@@ -370,6 +371,7 @@ function processMoveCommand(command) {
   const vector = DIRECTION_VECTORS[direction];
   playerPosition.row += vector.row;
   playerPosition.column += vector.column;
+  updateMap();
 
   return multipleLineResponse([AFTER_MOVING_RESPONSE].concat(describeCurrentIsland()));
 }
@@ -388,16 +390,19 @@ function processPushCommand() {
   } else {
     const { previousCorner, newCorner, lastBorder } = snakeMove;
 
+    updateMap();
+
     if (newCorner.isInitialSnakePosition()) {
       if (validateSnake()) {
         gameWon = true;
 
         document.getElementById('command-container').remove();
+        window.getSelection?.().empty?.(); // Deselect page text
 
         return [
           createResponseTextLine('The snake slithers, as its head links with its tail.'),
           createResponseTextLine('Congratulations, you have completed the puzzle!'),
-          drawMap(),
+          gameWinMapElement(),
         ];
       }
 
@@ -461,9 +466,11 @@ function snakeMovementResponse(previousCorner, newCorner, lastBorder, snakeDirec
 
   ALL_DIRECTIONS.forEach((direction) => {
     const border = currentIsland.getBorder(direction);
+    const newIsland = currentIsland.getIsland(direction);
+
     if (border === lastBorder) {
       lastBorderDirection = direction;
-      if (!border.getIsIronBridge() && !border.getNoBridge()) {
+      if (newIsland && !border.getIsIronBridge() && !border.getNoBridge()) {
         lastBorderBridgeDestroyed = true;
       }
     }
@@ -589,20 +596,41 @@ function processTalkCommand() {
 }
 
 function processMapCommand() {
-  const mapTable = drawMap();
-  return [mapTable];
+  if (mapData !== null) {
+    document.getElementById('main-map').remove();
+    mapData = null;
+    return singleLineResponse('Map disabled.');
+  } else {
+    mapData = createMapElement();
+
+    mapData.mapTable.id = 'main-map';
+    document.getElementById('response-text-container').appendChild(mapData.mapTable);
+    updateMap();
+
+    return singleLineResponse('Map enabled.');
+  }
+}
+
+function updateMap() {
+  if (mapData !== null) {
+    updateMapElement(mapData.mapTable, mapData.tableArray, mapData.snakePositionCircle, false);
+  }
 }
 
 const MAP_TABLE_CELL_SIZE = 60;
 const SNAKE_POSITION_CIRCLE_SIZE = 20;
 
-function drawMap() {
+function gameWinMapElement() {
+  const { mapTable, tableArray, snakePositionCircle } = createMapElement();
+  updateMapElement(mapTable, tableArray, snakePositionCircle, true);
+  return mapTable;
+}
+
+function createMapElement() {
   const mapTable = document.createElement('table');
   addClass(mapTable, 'map-table');
 
-  if (gameWon) {
-    addClass(mapTable, 'margin-above-map');
-  }
+  const tableArray = [];
 
   const mapTableBody = document.createElement('tbody');
   mapTable.appendChild(mapTableBody);
@@ -610,11 +638,41 @@ function drawMap() {
   for (let row = 0; row < GRID_HEIGHT; row += 1) {
     const rowElement = document.createElement('tr');
     mapTableBody.appendChild(rowElement);
+    tableArray.push([]);
 
     for (let column = 0; column < GRID_WIDTH; column += 1) {
       const columnElement = document.createElement('td');
-      addClass(columnElement, 'map-table-cell');
       rowElement.appendChild(columnElement);
+
+      const cellContent = document.createElement('div');
+      addClass(cellContent, 'map-table-cell-inner');
+      columnElement.appendChild(cellContent);
+
+      tableArray[row].push({ columnElement, cellContent });
+    }
+  }
+
+  const snakePositionCircle = document.createElement('div');
+  addClass(snakePositionCircle, 'snake-position');
+  mapTable.appendChild(snakePositionCircle);
+
+  return { mapTable, tableArray, snakePositionCircle };
+}
+
+function updateMapElement(mapTable, tableArray, snakePositionCircle, isGameWinMap) {
+  if (isGameWinMap) {
+    addClass(mapTable, 'game-win-map');
+  }
+
+  for (let row = 0; row < GRID_HEIGHT; row += 1) {
+    for (let column = 0; column < GRID_WIDTH; column += 1) {
+      const { columnElement, cellContent } = tableArray[row][column];
+
+      // Reset table elements
+      columnElement.className = 'map-table-cell';
+      while (cellContent.firstChild) {
+        cellContent.removeChild(cellContent.firstChild);
+      }
 
       const island = Island.getIslandForPosition({ row, column });
       const topBorder = island.getBorder(Direction.NORTH);
@@ -643,18 +701,14 @@ function drawMap() {
         addClass(columnElement, 'right-border-snake');
       }
 
-      const cellContent = document.createElement('div');
-      addClass(cellContent, 'map-table-cell-inner');
-      columnElement.appendChild(cellContent);
-
-      if (!gameWon && row === playerPosition.row && column === playerPosition.column) {
+      if (!isGameWinMap && row === playerPosition.row && column === playerPosition.column) {
         const positionMarker = document.createElement('div');
         positionMarker.innerText = '\u2605';
         addClass(positionMarker, 'position-marker');
         cellContent.appendChild(positionMarker);
       }
 
-      if (gameWon && island.hasRequiredSnakeVisits()) {
+      if (isGameWinMap && island.hasRequiredSnakeVisits()) {
         const requiredSnakeVisits = document.createElement('div');
         requiredSnakeVisits.innerText = island.getRequiredSnakeVisits();
         addClass(requiredSnakeVisits, 'required-snake-visits');
@@ -663,15 +717,12 @@ function drawMap() {
     }
   }
 
-  if (!gameWon) {
-    const snakePositionCircle = document.createElement('div');
-    addClass(snakePositionCircle, 'snake-position');
+  if (isGameWinMap) {
+    snakePositionCircle.style.display = 'none';
+  } else {
     snakePositionCircle.style.left = `${snakePosition.column * MAP_TABLE_CELL_SIZE - SNAKE_POSITION_CIRCLE_SIZE / 2}px`;
     snakePositionCircle.style.top = `${snakePosition.row * MAP_TABLE_CELL_SIZE - SNAKE_POSITION_CIRCLE_SIZE / 2}px`;
-    mapTable.appendChild(snakePositionCircle);
   }
-
-  return mapTable;
 }
 
 function formatDirections(directions, conjunction = 'and', withQuotes = false) {
@@ -723,6 +774,10 @@ function describeCurrentIsland() {
     const border = currentIsland.getBorder(direction);
     const newIsland = currentIsland.getIsland(direction);
 
+    if (border.getVisitedBySnake()) {
+      snakeBodyDirs.push(direction);
+    }
+
     if (newIsland) {
       islandDirs.push(direction);
       if (border.getIsIronBridge() || (!border.getVisitedBySnake() && !border.getNoBridge())) {
@@ -745,17 +800,13 @@ function describeCurrentIsland() {
           lavaDirsNoBridge.push(direction);
         }
       }
-      if (border.getVisitedBySnake()) {
-        snakeBodyDirs.push(direction);
-
-        if (!border.getIsIronBridge() && !border.getNoBridge()) {
-          destroyedBridgeDirs.push(direction);
-        }
-      } 
+      if (border.getVisitedBySnake() && !border.getIsIronBridge() && !border.getNoBridge()) {
+        destroyedBridgeDirs.push(direction);
       }
       if (border.getNoBridge()) {
         noBridgeDirs.push(direction);
       }
+    }
   });
 
   const isSnakeBodyVisible = snakeBodyDirs.length > 0;
