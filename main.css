@@ -172,7 +172,15 @@ button {
   }
 
   .main-container-inner {
-    padding: 5px;
+    padding: 0;
+  }
+
+  .command-input-container {
+    margin-bottom: 10px;
+  }
+  
+  .send-command-button {
+    margin-bottom: 10px;
   }
 }
 
