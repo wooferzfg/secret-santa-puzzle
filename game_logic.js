@@ -215,9 +215,9 @@ class Border {
   }
 }
 
-GAME_START_RESPONSE = 'You wake up and find yourself on a small island. The island is surrounded by a large moat on all sides. You see many similar islands in the distance.';
+GAME_START_RESPONSE = 'You wake up and find yourself on a small square island. The island is surrounded by a large moat on all sides. You see many similar islands in the distance.';
 RESTART_INFO = 'At any time, if you would like to restart the game, type \'restart\'.';
-AFTER_MOVING_RESPONSE = 'You cross the bridge, and you are now on a different small island.'
+AFTER_MOVING_RESPONSE = 'You cross the bridge, and you are now on a different small square island.'
 HAMSTER_INFO = 'In the middle of the island, there is a broken stone tablet. There is a hamster sitting on top of the tablet, muttering to themselves. Type \'talk\' to talk to the hamster.'
 
 function resetPuzzle() {
