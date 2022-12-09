@@ -217,9 +217,9 @@ class Border {
 }
 
 GAME_START_RESPONSE = 'You wake up and find yourself on a small square island. The island is surrounded by a large moat on all sides. You see many similar islands in the distance.';
-RESTART_INFO = 'At any time, if you would like to restart the game, type \'restart\'.';
+RESTART_INFO = "At any time, if you would like to restart the game, type 'restart'.";
 AFTER_MOVING_RESPONSE = 'You cross the bridge, and you are now on a different small square island.'
-HAMSTER_INFO = 'In the middle of the island, there is a broken stone tablet. There is a hamster sitting on top of the tablet, muttering to themselves. Type \'talk\' to talk to the hamster.'
+HAMSTER_INFO = "In the middle of the island, there is a broken stone tablet. There is a hamster sitting on top of the tablet, muttering to themselves. Type 'talk' to talk to the hamster."
 
 function resetPuzzle() {
   islands = [];
@@ -283,10 +283,10 @@ function resetPuzzle() {
   islands[4][0].buttonDirection = Direction.SOUTH;
   islands[4][3].buttonDirection = Direction.NORTH;
 
-  islands[1][0].hintText = 'The snake\'s eggs count how many sides of the island the snake must visit';
-  islands[1][3].hintText = 'Perhaps typing \'map\' could help you navigate';
-  islands[3][3].hintText = 'The snake\'s journey begins and ends at its burrow';
+  islands[1][0].hintText = "The snake's eggs count how many sides of the island the snake must visit";
+  islands[1][3].hintText = "Perhaps typing 'map' could help you navigate";
   islands[2][2].hintText = "Most commands can be be typed as a single letter (e.g. 's' is the same as 'south')";
+  islands[3][3].hintText = "The snake's journey begins and ends at its burrow";
   islands[3][4].hintText = 'The path of the snake has a unique solution'
 
   islands[0][4].hasHamster = true;
@@ -497,7 +497,7 @@ function snakeMovementResponse(previousCorner, newCorner, lastBorder, snakeDirec
 
   if (previousCornerDirection === null && newCornerDirection === null) {
     if (anySnakeBodyBorders) {
-      return singleLineResponse('The giant snake moves forward, as its body still fills the moat. The snake\'s head is too far away for you to see.')
+      return singleLineResponse("The giant snake moves forward, as its body still fills the moat. The snake's head is too far away for you to see.")
     }
 
     return singleLineResponse('You hear something move in the distance.');
@@ -505,7 +505,7 @@ function snakeMovementResponse(previousCorner, newCorner, lastBorder, snakeDirec
   if (previousCornerDirection === null && newCornerDirection !== null) {
     if (anySnakeBodyBorders) {
       return singleLineResponse(
-        'The giant snake moves forward, as its body still fills the moat. The snake\'s head moves through a moat in the distance, ' +
+        "The giant snake moves forward, as its body still fills the moat. The snake's head moves through a moat in the distance, " +
         `heading ${snakeDirection} until it stops at the ${newCornerDirection} corner of the island you are on.`
       );
     }
@@ -859,7 +859,7 @@ function describeCurrentIsland() {
   const eggDescr = currentIsland.hasButton() ? 'At the foot of the pedestal, there is a large egg' : 'In the middle of the island, there is a large egg on the ground'
 
   islandLines = [
-    currentIsland.hasButton() ? `On a pedestal in the middle of the island, there is a button with the letter "${buttonLetter(currentIsland.getButtonDirection())}" on it. Type \'push\' to push the button.` : null,
+    currentIsland.hasButton() ? `On a pedestal in the middle of the island, there is a button with the letter "${buttonLetter(currentIsland.getButtonDirection())}" on it. Type 'push' to push the button.` : null,
     currentIsland.hasEgg() ? `${eggDescr} with the letter "${currentIsland.getEggLetter()}" engraved on it.` : null,
     currentIsland.hasHintText() ? `In the middle of the island, there is a stone tablet that reads: "${currentIsland.getHintText()}."` : null,
     currentIsland.getHasHamster() ? HAMSTER_INFO : null,
@@ -900,7 +900,7 @@ function describeCurrentIsland() {
 
   response.push(
     '',
-    moveDirs.length > 0 ? `Type ${formatDirections(moveDirs, 'or', true)} to move in that direction.` : 'You cannot move. Type \'restart\' to restart the game.',
+    moveDirs.length > 0 ? `Type ${formatDirections(moveDirs, 'or', true)} to move in that direction.` : "You cannot move. Type 'restart' to restart the game.",
   );
 
   return response;
