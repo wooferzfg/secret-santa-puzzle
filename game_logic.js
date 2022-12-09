@@ -284,9 +284,10 @@ function resetPuzzle() {
   islands[4][3].buttonDirection = Direction.NORTH;
 
   islands[1][0].hintText = 'The snake\'s eggs count how many sides of the island the snake must visit';
-  islands[1][3].hintText = 'Perhaps a \'map\' could be useful for navigating the islands';
+  islands[1][3].hintText = 'Perhaps typing \'map\' could help you navigate';
   islands[2][2].hintText = 'All you need for a command is one letter. \'p\' is the same as \'push\'';
-  islands[3][3].hintText = 'The snake must visit all its eggs and return home';
+  islands[3][3].hintText = 'The snake\'s journey begins and ends at its burrow';
+  islands[3][4].hintText = 'The path of the snake has a unique solution'
 
   islands[0][4].hasHamster = true;
 
@@ -584,10 +585,10 @@ function processTalkCommand() {
       (
         '"The stone tablet had a puzzle on it, before it was destroyed. ' +
         'I remember the puzzle perfectly, but I was never able to figure out the solution. ' +
-        'The tablet said that the digits 1-6 need to be placed in every row, column, and box. ' +
+        'The tablet said that the digits 1-6 need to be placed once each in every row, column, and box. ' +
         'Also, neighboring digits on a gray line must be at least 3 apart. ' +
-        'I tried solving the puzzle with those rules, but I ended up with two different solutions. ' +
-        'I also never figured out the significance of the letters, but maybe they could determine which of the solutions is correct. ' +
+        'I tried solving the puzzle with those rules, but I ended up with two solutions. ' +
+        'I also never figured out the significance of the letters, but maybe they could help you determine which of the two solutions is correct. ' +
         'Perhaps you could '
       ),
       'span',
@@ -869,7 +870,7 @@ function describeCurrentIsland() {
     ropeBridgeDirs.length > 0 ? `To the ${formatDirections(ropeBridgeDirs)}, there ${pluralize('is a', 'are', ropeBridgeDirs)} flimsy rope ${pluralize('bridge', 'bridges', ropeBridgeDirs)}.` : null,
     ironBridgeDirs.length > 0 ? (
       `To the ${formatDirections(ironBridgeDirs)}, there ${pluralize('is an', 'are', ironBridgeDirs)} arched iron ${pluralize('bridge', 'bridges', ironBridgeDirs)}. ` +
-      'This type of bridge could survive a giant creature passing under it.'
+      `A giant creature could pass under ${pluralize('this bridge', 'these bridges', ironBridgeDirs)} without destroying ${pluralize('it', 'them', ironBridgeDirs)}.`
     ) : null,
     lavaDirsWithBridge.length > 0 ? `To the ${formatDirections(lavaDirsWithBridge)}, under the bridge, the moat is filled with lava. Not even the bravest of creatures would dare pass through it.` : null,
     lavaDirsNoBridge.length > 0 ? `To the ${formatDirections(lavaDirsNoBridge)}, the moat is filled with lava. Not even the bravest of creatures would dare pass through it.` : null,
