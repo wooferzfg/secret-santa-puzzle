@@ -124,26 +124,26 @@ button {
   width: 20px;
   height: 20px;
   border-radius: 50%;
-  background-color: #be78ff;
+  background-color: #00920c;
 }
 
 .map-table-cell.bottom-border-snake {
-  border-bottom: 5px solid #be78ff;
+  border-bottom: 5px solid #00920c;
   padding-bottom: 2.5px;
 }
 
 .map-table-cell.top-border-snake {
-  border-top: 5px solid #be78ff;
+  border-top: 5px solid #00920c;
   padding-top: 2.5px;
 }
 
 .map-table-cell.left-border-snake {
-  border-left: 5px solid #be78ff;
+  border-left: 5px solid #00920c;
   padding-left: 2.5px;
 }
 
 .map-table-cell.right-border-snake {
-  border-right: 5px solid #be78ff;
+  border-right: 5px solid #00920c;
   padding-right: 2.5px;
 }
 
