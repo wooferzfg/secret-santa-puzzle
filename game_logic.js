@@ -299,12 +299,12 @@ function resetPuzzle() {
   islands[2][4].requiredSnakeVisits = 2;
   islands[4][4].requiredSnakeVisits = 1;
 
-  islands[1][0].hintText = "The engraving on a snake's egg counts how many sides of the island the snake must visit";
-  islands[1][3].hintText = "The snake's journey begins and ends at its burrow";
+  islands[1][0].hintText = `The engraving on a ${withColor("snake's egg", 'orange')} counts how many sides of the island the snake must visit`;
+  islands[1][3].hintText = `The ${withColor('snake', 'green')}'s journey begins and ends at its burrow`;
   islands[2][2].hintText = `Most commands can be be typed as a single letter (e.g. '${withBold('s')}' is the same as '${withBold('south')}')`;
-  islands[3][2].hintText = `Type '${withBold('undo')}' to retract the snake's last move`;
+  islands[3][2].hintText = `Type '${withBold('undo')}' to retract the ${withColor('snake', 'green')}'s last move`;
   islands[3][3].hintText = `Typing '${withBold('map')}' might help you navigate`;
-  islands[3][4].hintText = 'The path of the snake has a unique solution'
+  islands[3][4].hintText = `The only way for you to escape from this labyrinth is to find the unique solution for the path of the ${withColor('snake', 'green')}`
 
   islands[0][4].hasHamster = true;
 
@@ -621,8 +621,8 @@ function processTalkCommand() {
     createResponseTextLine(
       'I tried solving the puzzle with those rules, but I ended up with two solutions. ' +
       `The puzzle has some letters in it, and I've seen the same letters ${withColor('somewhere else', 'orange')}, but I can't remember where. ` +
-      `Perhaps if you ${withBold('assign a value to each letter')} based on the numbers you get from each of the solutions, ` +
-      'you can determine which of the solutions is correct?'
+      `Perhaps if you ${withColor('assign a value to each letter', 'orange')} based on the numbers you get from each of the solutions, ` +
+      `you can determine which solution's values will allow you to solve the ${withColor('mystery of these islands', 'green')}.`
     ),
     createResponseTextLine(''),
     createResponseTextLine(
@@ -632,7 +632,7 @@ function processTalkCommand() {
       'span',
     ),
     sudokuPuzzleLinkElement('try the puzzle yourself'),
-    createResponseTextLine(' and help me solve this mystery!"', 'span'),
+    createResponseTextLine('!"', 'span'),
   ]
 }
 
