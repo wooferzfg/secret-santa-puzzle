@@ -299,7 +299,7 @@ function resetPuzzle() {
   islands[2][4].requiredSnakeVisits = 2;
   islands[4][4].requiredSnakeVisits = 1;
 
-  islands[1][0].hintText = "The snake's eggs count how many sides of the island the snake must visit";
+  islands[1][0].hintText = "The engraving on a snake's egg counts how many sides of the island the snake must visit";
   islands[1][3].hintText = "The snake's journey begins and ends at its burrow";
   islands[2][2].hintText = "Most commands can be be typed as a single letter (e.g. 's' is the same as 'south')";
   islands[3][2].hintText = "Type 'undo' to retract the snake's last move";
@@ -611,19 +611,27 @@ function processTalkCommand() {
 
   return [
     createResponseTextLine(
+      '"The stone tablet had a puzzle on it, before it was destroyed. ' +
+      'I remember the puzzle perfectly, but I was never able to figure out the solution. ' +
+      'The tablet said that the digits 1-6 need to be placed once each in every row, column, and box. ' +
+      'Also, neighboring digits on a gray line must be at least 3 apart.'
+    ),
+    createResponseTextLine(''),
+    createResponseTextLine(
+      'I tried solving the puzzle with those rules, but I ended up with two solutions. ' +
+      "The puzzle has some letters in it, and I've seen the same letters somewhere else, but I can't remember where. " +
+      'Perhaps if you assign a value to each letter based on the numbers you get from each of the solutions, ' +
+      'you can determine which of the solutions is correct?'
+    ),
+    createResponseTextLine(''),
+    createResponseTextLine(
       (
-        '"The stone tablet had a puzzle on it, before it was destroyed. ' +
-        'I remember the puzzle perfectly, but I was never able to figure out the solution. ' +
-        'The tablet said that the digits 1-6 need to be placed once each in every row, column, and box. ' +
-        'Also, neighboring digits on a gray line must be at least 3 apart. ' +
-        'I tried solving the puzzle with those rules, but I ended up with two solutions. ' +
-        'I also never figured out the significance of the letters, but maybe they could help determine which of the two solutions is correct. ' +
-        'Perhaps you could '
+        'Please '
       ),
       'span',
     ),
     sudokuPuzzleLinkElement('try the puzzle yourself'),
-    createResponseTextLine('?"', 'span'),
+    createResponseTextLine(' and help me solve this mystery!"', 'span'),
   ]
 }
 
@@ -920,7 +928,7 @@ function describeCurrentIsland() {
 
   const snakeBodyDescr = isSnakeHeadVisible ? 'the snake' : 'a giant snake';
   const snakeBodyAtBurrowDescr = isSnakeBodyVisible ? 'the snake' : 'a giant snake';
-  const eggDescr = currentIsland.hasButton() ? 'At the foot of the pedestal, there is a large egg' : 'In the middle of the island, there is a large egg on the ground'
+  const eggDescr = currentIsland.hasButton() ? 'At the foot of the pedestal, there is a large snake egg' : 'In the middle of the island, there is a large snake egg on the ground'
 
   islandLines = [
     currentIsland.hasButton() ? `On a pedestal in the middle of the island, there is a button with the letter "${buttonLetter(currentIsland.getButtonDirection())}" on it. Type 'push' to push the button.` : null,
