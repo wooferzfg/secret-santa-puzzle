@@ -947,7 +947,7 @@ function describeCurrentIsland() {
     ) : null,
     lavaDirsWithBridge.length > 0 ? `To the ${formatDirections(lavaDirsWithBridge)}, under the bridge, the moat is filled with ${withColor('lava', 'red')}. Not even the bravest of creatures would dare pass through it.` : null,
     lavaDirsNoBridge.length > 0 ? `To the ${formatDirections(lavaDirsNoBridge)}, the moat is filled with ${withColor('lava', 'red')}. Not even the bravest of creatures would dare pass through it.` : null,
-    snakeHeadAtBurrowDirection ? `To the ${snakeHeadAtBurrowDirection}, a ${withColor("giant snake's head", 'green')} is peeking out of a large ${withColor('burrow', 'green')} in the moat.` : null,
+    snakeHeadAtBurrowDirection ? `To the ${snakeHeadAtBurrowDirection}, a ${withColor("giant snake's head", 'green')} is peeking out of a large burrow in the moat.` : null,
     snakeHeadDirection ? `To the ${snakeHeadDirection}, a ${withColor("giant snake's head", 'green')} is in the moat.` : null,
     destroyedBridgeAndSnakeDirs.length > 0 ? `To the ${formatDirections(destroyedBridgeAndSnakeDirs)}, ${snakeBodyDescr} fills the moat, and the ${pluralize(`${withColor('rope bridge', 'brown')} has been`, `${withColor('rope bridges', 'brown')} have been`, destroyedBridgeAndSnakeDirs)} destroyed.` : null,
     snakeBodyDirs.length > 0 ? `To the ${formatDirections(snakeBodyDirs)}, ${snakeBodyDescr} fills the moat.` : null,
@@ -957,7 +957,7 @@ function describeCurrentIsland() {
     ironBridgeAndSnakeDirs.length > 0 ? (
       `To the ${formatDirections(ironBridgeAndSnakeDirs)}, above the snake's body, there ${pluralize('is an', 'are', ironBridgeAndSnakeDirs)} ${withColor(`arched iron ${pluralize('bridge', 'bridges', ironBridgeAndSnakeDirs)}`, 'blue')}.`
     ) : null,
-    snakeBodyAtBurrowDirection ? `To the ${snakeBodyAtBurrowDirection}, ${snakeBodyAtBurrowDescr} emerges from a large ${withColor('burrow', 'green')} in the moat.` : null,
+    snakeBodyAtBurrowDirection ? `To the ${snakeBodyAtBurrowDirection}, ${snakeBodyAtBurrowDescr} emerges from a large burrow in the moat.` : null,
     destroyedBridgeDirs.length > 0 ? `To the ${formatDirections(destroyedBridgeDirs)}, the ${pluralize(`${withColor('rope bridge', 'brown')} has been`, `${withColor('rope bridges', 'brown')} have been`, destroyedBridgeDirs)} destroyed.` : null,
     noBridgeDirs.length > 0 ? `There ${pluralize(`is ${withColor('no bridge', 'pink')}`, `are ${withColor('no bridges', 'pink')}`, noBridgeDirs)} to the ${formatDirections(noBridgeDirs, 'or')}.` : null,
   ].filter((line) => line !== null);
