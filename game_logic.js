@@ -36,6 +36,12 @@ const BorderType = {
 
 const INITIAL_PLAYER_POSITION = { row: 2, column: 1 };
 const INITIAL_SNAKE_POSITION = { row: 1, column: 2 };
+const BUTTON_LOCATIONS = {
+  [Direction.NORTH]: { row: 4, column: 3 },
+  [Direction.EAST]: { row: 0, column: 2 },
+  [Direction.SOUTH]: { row: 4, column: 0 },
+  [Direction.WEST]: { row: 0, column: 0 },
+}
 
 let islands;
 let corners;
@@ -43,8 +49,8 @@ let horizontalBorders;
 let verticalBorders;
 let playerPosition;
 let snakePosition;
-let pathLength;
 let gameWon;
+let snakePath;
 let mapData = null;
 
 const GRID_WIDTH = 5;
@@ -58,6 +64,13 @@ class Island {
     this.requiredSnakeVisits = null;
     this.hintText = null;
     this.hasHamster = false;
+
+    ALL_DIRECTIONS.forEach((direction) => {
+      const buttonLocation = BUTTON_LOCATIONS[direction];
+      if (buttonLocation.row === row && buttonLocation.column === column) {
+        this.buttonDirection = direction;
+      }
+    });
   }
 
   getCorner(cornerDirection) {
@@ -171,6 +184,10 @@ class Corner {
     this.visitedBySnake = true;
   }
 
+  undoVisitedBySnake() {
+    this.visitedBySnake = false;
+  }
+
   isInitialSnakePosition() {
     return this.row === INITIAL_SNAKE_POSITION.row && this.column === INITIAL_SNAKE_POSITION.column;
   }
@@ -203,6 +220,10 @@ class Border {
     this.visitedBySnake = true;
   }
 
+  undoVisitedBySnake() {
+    this.visitedBySnake = false;
+  }
+
   getNoBridge() {
     return this.noBridge;
   }
@@ -228,8 +249,8 @@ function resetPuzzle() {
   verticalBorders = [];
   playerPosition = { row: INITIAL_PLAYER_POSITION.row, column: INITIAL_PLAYER_POSITION.column };
   snakePosition = { row: INITIAL_SNAKE_POSITION.row, column: INITIAL_SNAKE_POSITION.column };
-  pathLength = 0;
   gameWon = false;
+  snakePath = [];
 
   for (let row = 0; row < GRID_HEIGHT; row += 1) {
     islands.push([]);
@@ -278,15 +299,11 @@ function resetPuzzle() {
   islands[2][4].requiredSnakeVisits = 2;
   islands[4][4].requiredSnakeVisits = 1;
 
-  islands[0][0].buttonDirection = Direction.WEST;
-  islands[0][2].buttonDirection = Direction.EAST;
-  islands[4][0].buttonDirection = Direction.SOUTH;
-  islands[4][3].buttonDirection = Direction.NORTH;
-
   islands[1][0].hintText = "The snake's eggs count how many sides of the island the snake must visit";
   islands[1][3].hintText = "The snake's journey begins and ends at its burrow";
   islands[2][2].hintText = "Most commands can be be typed as a single letter (e.g. 's' is the same as 'south')";
-  islands[3][3].hintText = "Perhaps typing 'map' could help you navigate";
+  islands[3][2].hintText = "Type 'undo' to retract the snake's last move";
+  islands[3][3].hintText = "Typing 'map' might help you navigate";
   islands[3][4].hintText = 'The path of the snake has a unique solution'
 
   islands[0][4].hasHamster = true;
@@ -305,6 +322,7 @@ const DIRECTION_COMMANDS = {
 const MAP_COMMANDS = ['m', 'map'];
 const PUSH_COMMANDS = ['p', 'push'];
 const TALK_COMMANDS = ['t', 'talk'];
+const UNDO_COMMANDS = ['u', 'undo'];
 const RESET_COMMANDS = ['reset', 'restart'];
 
 const ALL_DIRECTION_COMMANDS = Object.values(DIRECTION_COMMANDS).flat();
@@ -335,6 +353,9 @@ function processCommand(command) {
   }
   if (TALK_COMMANDS.includes(command)) {
     return processTalkCommand();
+  }
+  if (UNDO_COMMANDS.includes(command)) {
+    return processUndoCommand();
   }
   if (RESET_COMMANDS.includes(command)) {
     resetPuzzle();
@@ -431,7 +452,7 @@ function tryMoveSnake(direction) {
   if (!newCorner) {
     return { result: false };
   }
-  if (newCorner.getVisitedBySnake() && (pathLength <= 1 || !newCorner.isInitialSnakePosition())) {
+  if (newCorner.getVisitedBySnake() && (snakePath.length <= 1 || !newCorner.isInitialSnakePosition())) {
     return { result: false };
   }
 
@@ -440,14 +461,22 @@ function tryMoveSnake(direction) {
     return { result: false };
   }
 
-  const vector = DIRECTION_VECTORS[direction];
-  snakePosition.row += vector.row;
-  snakePosition.column += vector.column;
-
   newCorner.setVisitedBySnake();
   border.setVisitedBySnake();
 
-  pathLength += 1;
+  snakePath.push({
+    border,
+    corner: newCorner,
+    direction,
+    previousSnakePosition: {
+      row: snakePosition.row,
+      column: snakePosition.column,
+    },
+  });
+
+  const vector = DIRECTION_VECTORS[direction];
+  snakePosition.row += vector.row;
+  snakePosition.column += vector.column;
 
   return {
     result: true,
@@ -596,6 +625,41 @@ function processTalkCommand() {
     sudokuPuzzleLinkElement('try the puzzle yourself'),
     createResponseTextLine('?"', 'span'),
   ]
+}
+
+function processUndoCommand() {
+  if (snakePath.length === 0) {
+    return singleLineResponse('The snake has not moved yet.');
+  }
+
+  const {
+    corner,
+    border,
+    direction,
+    previousSnakePosition,
+  } = snakePath.pop();
+
+  corner.undoVisitedBySnake();
+  border.undoVisitedBySnake();
+
+  const buttonLocation = BUTTON_LOCATIONS[direction];
+  const isTeleported = playerPosition.row !== buttonLocation.row || playerPosition.column !== buttonLocation.column;
+  if (isTeleported) {
+    playerPosition.row = buttonLocation.row;
+    playerPosition.column = buttonLocation.column;
+  }
+
+  snakePosition.row = previousSnakePosition.row;
+  snakePosition.column = previousSnakePosition.column;
+
+  updateMap();
+
+  return multipleLineResponse(
+    [
+      `There is a sudden white flash. ${isTeleported ? 'You notice that you are now standing on a different island.' : ''} ` +
+      'You feel as though you have traveled back in time.',
+    ].concat(describeCurrentIsland())
+  );
 }
 
 function processMapCommand() {
