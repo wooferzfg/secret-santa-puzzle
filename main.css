@@ -198,3 +198,39 @@ button {
     display: none;
   }
 }
+
+.bold-text {
+  font-weight: bold;
+}
+
+.purple-text {
+  color: #7c00e2;
+}
+
+.orange-text {
+  color: #e26d00;
+}
+
+.indigo-text {
+  color: #001dbe;
+}
+
+.blue-text {
+  color: #007ce2;
+}
+
+.brown-text {
+  color: #8a5e00;
+}
+
+.pink-text {
+  color: #da00e2;
+}
+
+.red-text {
+  color: #e20000;
+}
+
+.green-text {
+  color: #00920c;
+}

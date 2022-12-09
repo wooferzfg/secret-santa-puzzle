@@ -238,9 +238,9 @@ class Border {
 }
 
 GAME_START_RESPONSE = 'You wake up and find yourself on a small square island. The island is surrounded by a large moat on all sides. You see many similar islands in the distance.';
-RESTART_INFO = "At any time, if you would like to restart the game, type 'restart'.";
+RESTART_INFO = `At any time, if you would like to restart the game, type '${withBold('restart')}'.`;
 AFTER_MOVING_RESPONSE = 'You cross the bridge, and you are now on a different small square island.'
-HAMSTER_INFO = "In the middle of the island, there is a broken stone tablet. There is a hamster sitting on top of the tablet, muttering to themselves. Type 'talk' to talk to the hamster."
+HAMSTER_INFO = `In the middle of the island, there is a broken ${withColor('stone tablet', 'indigo')}. There is a hamster sitting on top of the tablet, muttering to themselves. Type '${withBold('talk')}' to talk to the hamster.`
 
 function resetPuzzle() {
   islands = [];
@@ -301,9 +301,9 @@ function resetPuzzle() {
 
   islands[1][0].hintText = "The engraving on a snake's egg counts how many sides of the island the snake must visit";
   islands[1][3].hintText = "The snake's journey begins and ends at its burrow";
-  islands[2][2].hintText = "Most commands can be be typed as a single letter (e.g. 's' is the same as 'south')";
-  islands[3][2].hintText = "Type 'undo' to retract the snake's last move";
-  islands[3][3].hintText = "Typing 'map' might help you navigate";
+  islands[2][2].hintText = `Most commands can be be typed as a single letter (e.g. '${withBold('s')}' is the same as '${withBold('south')}')`;
+  islands[3][2].hintText = `Type '${withBold('undo')}' to retract the snake's last move`;
+  islands[3][3].hintText = `Typing '${withBold('map')}' might help you navigate`;
   islands[3][4].hintText = 'The path of the snake has a unique solution'
 
   islands[0][4].hasHamster = true;
@@ -526,7 +526,7 @@ function snakeMovementResponse(previousCorner, newCorner, lastBorder, snakeDirec
 
   if (previousCornerDirection === null && newCornerDirection === null) {
     if (anySnakeBodyBorders) {
-      return singleLineResponse("The giant snake moves forward, as its body still fills the moat. The snake's head is too far away for you to see.")
+      return singleLineResponse(`The ${withColor('giant snake', 'green')} moves forward, as its body still fills the moat. The snake's head is too far away for you to see.`)
     }
 
     return singleLineResponse('You hear something move in the distance.');
@@ -534,39 +534,39 @@ function snakeMovementResponse(previousCorner, newCorner, lastBorder, snakeDirec
   if (previousCornerDirection === null && newCornerDirection !== null) {
     if (anySnakeBodyBorders) {
       return singleLineResponse(
-        "The giant snake moves forward, as its body still fills the moat. The snake's head moves through a moat in the distance, " +
+        `The ${withColor('giant snake', 'green')} moves forward, as its body still fills the moat. The snake's head moves through a moat in the distance, ` +
         `heading ${snakeDirection} until it stops at the ${newCornerDirection} corner of the island you are on.`
       );
     }
 
     return singleLineResponse(
-      `A giant snake moves through a moat in the distance, heading ${snakeDirection} until it stops at ` +
+      `A ${withColor('giant snake', 'green')} moves through a moat in the distance, heading ${snakeDirection} until it stops at ` +
       `the ${newCornerDirection} corner of the island you are on.`
     );
   }
   if (previousCornerDirection !== null && newCornerDirection === null) {
     if (anySnakeBodyBorders) {
       return singleLineResponse(
-        `The giant snake moves away from the ${previousCornerDirection} corner of the island and heads ${snakeDirection}, as its body still fills the moat.`
+        `The ${withColor('giant snake', 'green')} moves away from the ${previousCornerDirection} corner of the island and heads ${snakeDirection}, as its body still fills the moat.`
       );
     }
 
     return singleLineResponse(
-      `The giant snake moves away from the ${previousCornerDirection} corner of the island and heads ${snakeDirection}.`
+      `The ${withColor('giant snake', 'green')} moves away from the ${previousCornerDirection} corner of the island and heads ${snakeDirection}.`
     );
   }
   if (previousCornerDirection !== null && newCornerDirection !== null) {
-    const snakeBodyMoatLine = `The snake's body fills the moat to the ${lastBorderDirection} of the island${lastBorderBridgeDestroyed ? ', destroying the rope bridge that was there before.' : '.'}`;
+    const snakeBodyMoatLine = `The snake's body fills the moat to the ${lastBorderDirection} of the island${lastBorderBridgeDestroyed ? `, destroying the ${withColor('rope bridge', 'brown')} that was there before.` : '.'}`;
 
     if (exitingBurrow) {
       return singleLineResponse(
-        `The giant snake emerges from the burrow, moving through the moat from the ${previousCornerDirection} corner to the ${newCornerDirection} corner of the island. ` +
+        `The ${withColor('giant snake', 'green')} emerges from the burrow, moving through the moat from the ${previousCornerDirection} corner to the ${newCornerDirection} corner of the island. ` +
         snakeBodyMoatLine
       )
     }
 
     return singleLineResponse(
-      `The giant snake moves through the moat from the ${previousCornerDirection} corner to the ${newCornerDirection} corner of the island. ` +
+      `The ${withColor('giant snake', 'green')} moves through the moat from the ${previousCornerDirection} corner to the ${newCornerDirection} corner of the island. ` +
       snakeBodyMoatLine
     );
   }
@@ -597,6 +597,7 @@ function validateSnake() {
 
 function sudokuPuzzleLinkElement(linkText) {
   const element = document.createElement('a');
+  element.className = 'bold-text';
   element.href = 'https://tinyurl.com/2t2w6ee5';
   element.target = '_blank';
   element.innerText = linkText;
@@ -619,8 +620,8 @@ function processTalkCommand() {
     createResponseTextLine(''),
     createResponseTextLine(
       'I tried solving the puzzle with those rules, but I ended up with two solutions. ' +
-      "The puzzle has some letters in it, and I've seen the same letters somewhere else, but I can't remember where. " +
-      'Perhaps if you assign a value to each letter based on the numbers you get from each of the solutions, ' +
+      `The puzzle has some letters in it, and I've seen the same letters ${withColor('somewhere else', 'orange')}, but I can't remember where. ` +
+      `Perhaps if you ${withBold('assign a value to each letter')} based on the numbers you get from each of the solutions, ` +
       'you can determine which of the solutions is correct?'
     ),
     createResponseTextLine(''),
@@ -802,7 +803,7 @@ function updateMapElement(mapTable, tableArray, snakePositionCircle, isGameWinMa
 
 function formatDirections(directions, conjunction = 'and', withQuotes = false) {
   if (withQuotes) {
-    directions = directions.map((direction) => `'${direction}'`);
+    directions = directions.map((direction) => `'${withBold(direction)}'`);
   }
 
   if (directions.length === 1) {
@@ -926,39 +927,39 @@ function describeCurrentIsland() {
     }
   });
 
-  const snakeBodyDescr = isSnakeHeadVisible ? 'the snake' : 'a giant snake';
-  const snakeBodyAtBurrowDescr = isSnakeBodyVisible ? 'the snake' : 'a giant snake';
-  const eggDescr = currentIsland.hasButton() ? 'At the foot of the pedestal, there is a large snake egg' : 'In the middle of the island, there is a large snake egg on the ground'
+  const snakeBodyDescr = isSnakeHeadVisible ? `the ${withColor("snake's body", 'green')}` : `a ${withColor("giant snake's body", 'green')}`;
+  const snakeBodyAtBurrowDescr = isSnakeBodyVisible ? `the ${withColor("snake's body", 'green')}` : `a ${withColor("giant snake's body", 'green')}`;
+  const eggDescr = currentIsland.hasButton() ? `At the foot of the pedestal, there is a large ${withColor('snake egg', 'orange')}` : `In the middle of the island, there is a large ${withColor('snake egg', 'orange')} on the ground`
 
   islandLines = [
-    currentIsland.hasButton() ? `On a pedestal in the middle of the island, there is a button with the letter "${buttonLetter(currentIsland.getButtonDirection())}" on it. Type 'push' to push the button.` : null,
-    currentIsland.hasEgg() ? `${eggDescr} with the letter "${currentIsland.getEggLetter()}" engraved on it.` : null,
-    currentIsland.hasHintText() ? `In the middle of the island, there is a stone tablet that reads: "${currentIsland.getHintText()}."` : null,
+    currentIsland.hasButton() ? `On a pedestal in the middle of the island, there is a ${withColor('button', 'purple')} with the letter ${withColor(buttonLetter(currentIsland.getButtonDirection()), 'purple')} on it. Type '${withBold('push')}' to push the button.` : null,
+    currentIsland.hasEgg() ? `${eggDescr} with the letter ${withColor(currentIsland.getEggLetter(), 'orange')} engraved on it.` : null,
+    currentIsland.hasHintText() ? `In the middle of the island, there is a ${withColor('stone tablet', 'indigo')} that reads: "${currentIsland.getHintText()}."` : null,
     currentIsland.getHasHamster() ? HAMSTER_INFO : null,
   ].filter((line) => line !== null);
 
   borderLines = [
     islandDirs.length > 0 ? `There ${pluralize('is another island', 'are other islands', islandDirs)} to the ${formatDirections(islandDirs)}.` : null,
-    ropeBridgeDirs.length > 0 ? `To the ${formatDirections(ropeBridgeDirs)}, there ${pluralize('is a', 'are', ropeBridgeDirs)} flimsy rope ${pluralize('bridge', 'bridges', ropeBridgeDirs)}.` : null,
+    ropeBridgeDirs.length > 0 ? `To the ${formatDirections(ropeBridgeDirs)}, there ${pluralize('is a', 'are', ropeBridgeDirs)} ${withColor(`flimsy rope ${pluralize('bridge', 'bridges', ropeBridgeDirs)}`, 'brown')}.` : null,
     ironBridgeDirs.length > 0 ? (
-      `To the ${formatDirections(ironBridgeDirs)}, there ${pluralize('is an', 'are', ironBridgeDirs)} arched iron ${pluralize('bridge', 'bridges', ironBridgeDirs)}. ` +
+      `To the ${formatDirections(ironBridgeDirs)}, there ${pluralize('is an', 'are', ironBridgeDirs)} ${withColor(`arched iron ${pluralize('bridge', 'bridges', ironBridgeDirs)}`, 'blue')}. ` +
       `A giant creature could pass under ${pluralize('this bridge', 'these bridges', ironBridgeDirs)} without destroying ${pluralize('it', 'them', ironBridgeDirs)}.`
     ) : null,
-    lavaDirsWithBridge.length > 0 ? `To the ${formatDirections(lavaDirsWithBridge)}, under the bridge, the moat is filled with lava. Not even the bravest of creatures would dare pass through it.` : null,
-    lavaDirsNoBridge.length > 0 ? `To the ${formatDirections(lavaDirsNoBridge)}, the moat is filled with lava. Not even the bravest of creatures would dare pass through it.` : null,
-    snakeHeadAtBurrowDirection ? `To the ${snakeHeadAtBurrowDirection}, a giant snake's head is peeking out of a large burrow in the moat.` : null,
-    snakeHeadDirection ? `To the ${snakeHeadDirection}, a giant snake's head is in the moat.` : null,
-    destroyedBridgeAndSnakeDirs.length > 0 ? `To the ${formatDirections(destroyedBridgeAndSnakeDirs)}, ${snakeBodyDescr}'s body fills the moat, and the wooden ${pluralize('bridge has been', 'bridges have been', destroyedBridgeAndSnakeDirs)} destroyed.` : null,
-    snakeBodyDirs.length > 0 ? `To the ${formatDirections(snakeBodyDirs)}, ${snakeBodyDescr}'s body fills the moat.` : null,
+    lavaDirsWithBridge.length > 0 ? `To the ${formatDirections(lavaDirsWithBridge)}, under the bridge, the moat is filled with ${withColor('lava', 'red')}. Not even the bravest of creatures would dare pass through it.` : null,
+    lavaDirsNoBridge.length > 0 ? `To the ${formatDirections(lavaDirsNoBridge)}, the moat is filled with ${withColor('lava', 'red')}. Not even the bravest of creatures would dare pass through it.` : null,
+    snakeHeadAtBurrowDirection ? `To the ${snakeHeadAtBurrowDirection}, a ${withColor("giant snake's head", 'green')} is peeking out of a large ${withColor('burrow', 'green')} in the moat.` : null,
+    snakeHeadDirection ? `To the ${snakeHeadDirection}, a ${withColor("giant snake's head", 'green')} is in the moat.` : null,
+    destroyedBridgeAndSnakeDirs.length > 0 ? `To the ${formatDirections(destroyedBridgeAndSnakeDirs)}, ${snakeBodyDescr} fills the moat, and the ${pluralize(`${withColor('rope bridge', 'brown')} has been`, `${withColor('rope bridges', 'brown')} have been`, destroyedBridgeAndSnakeDirs)} destroyed.` : null,
+    snakeBodyDirs.length > 0 ? `To the ${formatDirections(snakeBodyDirs)}, ${snakeBodyDescr} fills the moat.` : null,
     snakeWithIronBridgeOnlyDirs.length > 0 ? (
-      `To the ${formatDirections(snakeWithIronBridgeOnlyDirs)}, ${snakeBodyDescr}'s body fills the moat. Above the snake's body, there ${pluralize('is an', 'are', snakeWithIronBridgeOnlyDirs)} arched iron ${pluralize('bridge', 'bridges', snakeWithIronBridgeOnlyDirs)}.`
+      `To the ${formatDirections(snakeWithIronBridgeOnlyDirs)}, ${snakeBodyDescr} fills the moat. Above the snake's body, there ${pluralize('is an', 'are', snakeWithIronBridgeOnlyDirs)} ${withColor(`arched iron ${pluralize('bridge', 'bridges', snakeWithIronBridgeOnlyDirs)}`, 'blue')}.`
     ) : null,
     ironBridgeAndSnakeDirs.length > 0 ? (
-      `To the ${formatDirections(ironBridgeAndSnakeDirs)}, above the snake's body, there ${pluralize('is an', 'are', ironBridgeAndSnakeDirs)} arched iron ${pluralize('bridge', 'bridges', ironBridgeAndSnakeDirs)}.`
+      `To the ${formatDirections(ironBridgeAndSnakeDirs)}, above the snake's body, there ${pluralize('is an', 'are', ironBridgeAndSnakeDirs)} ${withColor(`arched iron ${pluralize('bridge', 'bridges', ironBridgeAndSnakeDirs)}`, 'blue')}.`
     ) : null,
-    snakeBodyAtBurrowDirection ? `To the ${snakeBodyAtBurrowDirection}, ${snakeBodyAtBurrowDescr}'s body emerges from a large burrow in the moat.` : null,
-    destroyedBridgeDirs.length > 0 ? `To the ${formatDirections(destroyedBridgeDirs)}, the wooden ${pluralize('bridge has been', 'bridges have been', destroyedBridgeDirs)} destroyed.` : null,
-    noBridgeDirs.length > 0 ? `There ${pluralize('is no bridge', 'are no bridges', noBridgeDirs)} to the ${formatDirections(noBridgeDirs, 'or')}.` : null,
+    snakeBodyAtBurrowDirection ? `To the ${snakeBodyAtBurrowDirection}, ${snakeBodyAtBurrowDescr} emerges from a large ${withColor('burrow', 'green')} in the moat.` : null,
+    destroyedBridgeDirs.length > 0 ? `To the ${formatDirections(destroyedBridgeDirs)}, the ${pluralize(`${withColor('rope bridge', 'brown')} has been`, `${withColor('rope bridges', 'brown')} have been`, destroyedBridgeDirs)} destroyed.` : null,
+    noBridgeDirs.length > 0 ? `There ${pluralize(`is ${withColor('no bridge', 'pink')}`, `are ${withColor('no bridges', 'pink')}`, noBridgeDirs)} to the ${formatDirections(noBridgeDirs, 'or')}.` : null,
   ].filter((line) => line !== null);
 
   const response = [];
@@ -994,13 +995,21 @@ function multipleLineResponse(lines) {
 
 function createResponseTextLine(text, elementType = 'div') {
   const textElement = document.createElement(elementType);
-  textElement.innerText = text;
+  textElement.innerHTML = text;
 
   if (!text) {
     addClass(textElement, 'empty-line');
   }
 
   return textElement;
+}
+
+function withColor(text, color) {
+  return `<span class="${color}-text bold-text">${text}</span>`;
+}
+
+function withBold(text) {
+  return `<span class="bold-text">${text}</span>`;
 }
 
 function createResponseLineElement(childElements) {
