@@ -422,8 +422,12 @@ function processPushCommand() {
         window.getSelection?.().empty?.(); // Deselect page text
 
         return [
-          createResponseTextLine('The snake slithers, as its head links with its tail.'),
-          createResponseTextLine('Congratulations, you have completed the puzzle!'),
+          createResponseTextLine(
+            `The snake ${withColor('slithers', 'green')}, as its head ${withColor('links', 'green')} with its tail. ` +
+            'A dense white fog surrounds you, and you suddenly start feeling tired...'
+          ),
+          createResponseTextLine(''),
+          createResponseTextLine('You wake up, back in your home. You feel satisfied, having just solved the puzzle of your dreams.'),
           gameWinMapElement(),
         ];
       }
@@ -793,11 +797,19 @@ function updateMapElement(mapTable, tableArray, snakePositionCircle, isGameWinMa
     }
   }
 
+  const anyBordersOnLeft = verticalBorders.some((verticalBordersRow) => {
+    const firstVerticalBorder = verticalBordersRow[0];
+    return firstVerticalBorder.getVisitedBySnake();
+  });
+  const anyBordersOnTop = horizontalBorders[0].some((horizontalBorder) => {
+    return horizontalBorder.getVisitedBySnake();
+  });
+
   if (isGameWinMap) {
     snakePositionCircle.style.display = 'none';
   } else {
-    snakePositionCircle.style.left = `${snakePosition.column * MAP_TABLE_CELL_SIZE - SNAKE_POSITION_CIRCLE_SIZE / 2}px`;
-    snakePositionCircle.style.top = `${snakePosition.row * MAP_TABLE_CELL_SIZE - SNAKE_POSITION_CIRCLE_SIZE / 2}px`;
+    snakePositionCircle.style.left = `${snakePosition.column * MAP_TABLE_CELL_SIZE - SNAKE_POSITION_CIRCLE_SIZE / 2 + 1 + anyBordersOnLeft * 2}px`;
+    snakePositionCircle.style.top = `${snakePosition.row * MAP_TABLE_CELL_SIZE - SNAKE_POSITION_CIRCLE_SIZE / 2 + 1 + anyBordersOnTop * 2}px`;
   }
 }
 
