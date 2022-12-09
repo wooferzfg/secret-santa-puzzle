@@ -588,7 +588,7 @@ function processTalkCommand() {
         'The tablet said that the digits 1-6 need to be placed once each in every row, column, and box. ' +
         'Also, neighboring digits on a gray line must be at least 3 apart. ' +
         'I tried solving the puzzle with those rules, but I ended up with two solutions. ' +
-        'I also never figured out the significance of the letters, but maybe they could help you determine which of the two solutions is correct. ' +
+        'I also never figured out the significance of the letters, but maybe they could help determine which of the two solutions is correct. ' +
         'Perhaps you could '
       ),
       'span',
