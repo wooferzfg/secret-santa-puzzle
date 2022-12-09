@@ -285,8 +285,8 @@ function resetPuzzle() {
 
   islands[1][0].hintText = 'The snake\'s eggs count how many sides of the island the snake must visit';
   islands[1][3].hintText = 'Perhaps typing \'map\' could help you navigate';
-  islands[2][2].hintText = 'All you need for a command is one letter. \'p\' is the same as \'push\'';
   islands[3][3].hintText = 'The snake\'s journey begins and ends at its burrow';
+  islands[2][2].hintText = "Most commands can be be typed as a single letter (e.g. 's' is the same as 'south')";
   islands[3][4].hintText = 'The path of the snake has a unique solution'
 
   islands[0][4].hasHamster = true;
