@@ -608,6 +608,14 @@ function sudokuPuzzleLinkElement(linkText) {
   return element;
 }
 
+function sudokuPuzzleImage() {
+  const element = document.createElement('img');
+  element.alt = 'An image of the Sudoku puzzle described by the hamster';
+  element.src = 'sudoku_puzzle_image.png';
+  element.className = 'sudoku-puzzle-image';
+  return element;
+}
+
 function processTalkCommand() {
   const currentIsland = Island.getIslandForPosition(playerPosition);
   if (!currentIsland.getHasHamster()) {
@@ -637,6 +645,7 @@ function processTalkCommand() {
     ),
     sudokuPuzzleLinkElement('try the puzzle yourself'),
     createResponseTextLine('!"', 'span'),
+    sudokuPuzzleImage(),
   ]
 }
 
