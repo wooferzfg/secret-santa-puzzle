@@ -635,7 +635,7 @@ function processTalkCommand() {
       'I tried solving the puzzle with those rules, but I ended up with two solutions. ' +
       `The puzzle has some letters in it, and I've seen the same letters ${withColor('somewhere else', 'orange')}, but I can't remember where. ` +
       `Perhaps if you ${withColor('assign a value to each letter', 'orange')} based on the numbers you get from each of the solutions, ` +
-      `you can determine which solution's values will allow you to solve the ${withColor('mystery of these islands', 'green')}.`
+      `you can determine which solution's values will allow you to ${withColor('escape from this labyrinth', 'green')}.`
     ),
     createResponseTextLine(''),
     createResponseTextLine(
