@@ -299,7 +299,7 @@ function resetPuzzle() {
   islands[2][4].requiredSnakeVisits = 2;
   islands[4][4].requiredSnakeVisits = 1;
 
-  islands[1][0].hintText = `The engraving on a ${withColor("snake's egg", 'orange')} counts how many sides of the island the snake must visit`;
+  islands[1][0].hintText = `The engraving on a ${withColor("snake egg", 'orange')} counts how many sides of the island the snake must visit`;
   islands[1][3].hintText = `The ${withColor('snake', 'green')}'s journey begins and ends at its burrow`;
   islands[2][2].hintText = `Most commands can be be typed as a single letter (e.g. '${withBold('s')}' is the same as '${withBold('south')}')`;
   islands[3][2].hintText = `Type '${withBold('undo')}' to retract the ${withColor('snake', 'green')}'s last move`;
