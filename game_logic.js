@@ -618,8 +618,8 @@ function processTalkCommand() {
     createResponseTextLine(
       '"The stone tablet had a puzzle on it, before it was destroyed. ' +
       'I remember the puzzle perfectly, but I was never able to figure out the solution. ' +
-      'The tablet said that the digits 1-6 need to be placed once each in every row, column, and box. ' +
-      'Also, neighboring digits on a gray line must be at least 3 apart.'
+      `The tablet said that ${withBold('the digits 1-6 need to be placed once each in every row, column, and box.')} ` +
+      `Also, ${withBold('neighboring digits on a gray line must be at least 3 apart')}.`
     ),
     createResponseTextLine(''),
     createResponseTextLine(
