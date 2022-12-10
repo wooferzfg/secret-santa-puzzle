@@ -428,6 +428,7 @@ function processPushCommand() {
           ),
           createResponseTextLine(''),
           createResponseTextLine('You wake up, back in your home. You feel satisfied, having just solved the puzzle of your dreams.'),
+          createResponseTextLine('Happy holidays!'),
           gameWinMapElement(),
         ];
       }
