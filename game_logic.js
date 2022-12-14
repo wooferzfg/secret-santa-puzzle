@@ -603,7 +603,7 @@ function validateSnake() {
 function sudokuPuzzleLinkElement(linkText) {
   const element = document.createElement('a');
   element.className = 'bold-text';
-  element.href = 'https://tinyurl.com/2t2w6ee5';
+  element.href = 'https://sudokupad.app/?puzzleid=fpuzzlesN4IgzglgXgpiBcA2ANCALhNAbO8QH5CRUBDAVzQAsB7AJwQKNVrJzBjQcP2JAHNaEACYIA2qOABfZFJnTZCyQF1kE%2BermapKtVo2KdivXsP6zc08aPaV6GAA9O8CSADGMLFjBiQAJQBMAMIAjCC2AG4kWGS4IACyvABm1AB2aIEMAMQAHACseXm8kLAIwfJuHl4%2BvsGB%2FmGokdGxAJJJqelZBfm5RdC4ZTIVnt7OfkEAzA0gTTEMAILtaRl4OT2FqMUDyqhYECm4LnsHo%2BJ%2BuSG8voiXSrbUFMcwKyCZAJyBHx%2B8AO7CVAgAAwAOgm5Sep1EfgmdSuABZYXdUA9sPtnlkvp8Mqg%2FkIAfAQWChhCxFDfAipqhfBc4WF7o80S93ljvjj%2FpQgaDwWjIX4EbSqQjekiQCinkzMayQLj8YTuSdSeNAgLoYFhfTUQcJSzsdL2ZyiaASc4yUFelTaog6ciGVqMTrfvqCVziTzFdTAlbBZ6rhdzX4bl6A2qrjcVddAlMRWLGfbMY68RznWClJIgA';
   element.target = '_blank';
   element.innerText = linkText;
   return element;
