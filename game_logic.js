@@ -327,6 +327,11 @@ const RESET_COMMANDS = ['reset', 'restart'];
 
 const ALL_DIRECTION_COMMANDS = Object.values(DIRECTION_COMMANDS).flat();
 
+function loadMainGame() {
+  addClass(document.getElementById('title-container'), 'hidden');
+  removeClass(document.getElementById('main-container'), 'hidden');
+}
+
 function sendCommand(event) {
   event.preventDefault();
 
@@ -602,7 +607,7 @@ function validateSnake() {
 
 function sudokuPuzzleLinkElement(linkText) {
   const element = document.createElement('a');
-  element.className = 'bold-text';
+  addClass(element, 'bold-text');
   element.href = 'https://sudokupad.app/?puzzleid=fpuzzlesN4IgzglgXgpiBcA2ANCALhNAbO8QH5CRUBDAVzQAsB7AJwQKNVrJzBjQcP2JAHNaEACYIA2qOABfZFJnTZCyQF1kE%2BermapKtVo2KdivXsP6zc08aPaV6GAA9O8CSADGMLFjBiQAJQBMAMIAjCC2AG4kWGS4IACyvABm1AB2aIEMAMQAHACseXm8kLAIwfJuHl4%2BvsGB%2FmGokdGxAJJJqelZBfm5RdC4ZTIVnt7OfkEAzA0gTTEMAILtaRl4OT2FqMUDyqhYECm4LnsHo%2BJ%2BuSG8voiXSrbUFMcwKyCZAJyBHx%2B8AO7CVAgAAwAOgm5Sep1EfgmdSuABZYXdUA9sPtnlkvp8Mqg%2FkIAfAQWChhCxFDfAipqhfBc4WF7o80S93ljvjj%2FpQgaDwWjIX4EbSqQjekiQCinkzMayQLj8YTuSdSeNAgLoYFhfTUQcJSzsdL2ZyiaASc4yUFelTaog6ciGVqMTrfvqCVziTzFdTAlbBZ6rhdzX4bl6A2qrjcVddAlMRWLGfbMY68RznWClJIgA';
   element.target = '_blank';
   element.innerText = linkText;
@@ -613,7 +618,7 @@ function sudokuPuzzleImage() {
   const element = document.createElement('img');
   element.alt = 'An image of the Sudoku puzzle described by the hamster';
   element.src = 'sudoku_puzzle_image.png';
-  element.className = 'sudoku-puzzle-image';
+  addClass(element, 'sudoku-puzzle-image');
   return element;
 }
 
@@ -1046,11 +1051,11 @@ function createResponseLineElement(childElements) {
 }
 
 function addClass(element, className) {
-  if (element.className) {
-    element.className += ` ${className}`;
-  } else {
-    element.className = className;
-  }
+  element.classList.add(className);
+}
+
+function removeClass(element, className) {
+  element.classList.remove(className);
 }
 
 function addResponse(childElements) {
