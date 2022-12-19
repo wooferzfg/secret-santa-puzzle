@@ -24,6 +24,7 @@ button {
 
 .main-container-inner {
   padding: 25px 25px 15px;
+  width: 100%;
 }
 
 #response-text-container {
@@ -39,6 +40,7 @@ button {
   background-color: #EEEEEE;
   margin-bottom: 20px;
   padding: 15px 30px;
+  width: calc(100% - 60px);
 }
 
 #command-container {
@@ -169,6 +171,7 @@ button {
     flex-grow: 1;
     margin-bottom: 10px;
     padding: 10px 20px;
+    width: calc(100% - 40px);
   }
 
   #response-text .response-line {
