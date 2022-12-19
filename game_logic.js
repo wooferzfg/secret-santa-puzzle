@@ -1069,6 +1069,8 @@ function addResponse(childElements) {
   }
 
   responseText.scrollTop = responseText.scrollHeight;
+
+  document.getElementById('command-container').scrollIntoView({ block: 'end' });
 }
 
 /*
