@@ -263,6 +263,7 @@ button {
   margin: 25px 0;
   padding: 0 25px;
   max-width: calc(100% - 50px);
+  max-height: calc(100% - 225px);
   height: 100%;
   object-fit: contain;
 }
